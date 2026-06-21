@@ -1,0 +1,41 @@
+{
+  "name": "employee-management-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:report": "playwright test --reporter=html && playwright show-report"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "axios": "^1.4.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.40.0",
+    "quill": "^2.0.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
+    "react-icons": "^4.10.1",
+    "react-quill": "^2.0.0",
+    "react-router-dom": "^6.14.2",
+    "recharts": "^2.7.2",
+    "socket.io-client": "^4.8.3",
+    "tailwind-merge": "^3.6.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/react": "^18.3.29",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.27",
+    "tailwindcss": "^3.3.3",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  }
+}
