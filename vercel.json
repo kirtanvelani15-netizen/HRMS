@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://hr-backend-psi-five.vercel.app/api/:path*"
+      "destination": "https://athletic-connection-production-7781.up.railway.app/api/:path*"
     },
     {
       "source": "/uploads/:path*",
-      "destination": "https://hr-backend-psi-five.vercel.app/uploads/:path*"
+      "destination": "https://athletic-connection-production-7781.up.railway.app/uploads/:path*"
     },
     {
       "source": "/(.*)",
