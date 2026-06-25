@@ -35,7 +35,7 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const dashboardMap = { admin: '/admin', hr: '/hr', employee: '/employee' };
+  const dashboardMap = { superadmin: '/superadmin', admin: '/admin', hr: '/hr', employee: '/employee' };
   const disabled = !ready || loading;
 
   useEffect(() => {

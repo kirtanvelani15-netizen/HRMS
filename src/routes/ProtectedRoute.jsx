@@ -12,7 +12,7 @@ export const ProtectedRoute = ({ roles }) => {
 
   if (roles && !roles.includes(user.role)) {
     // Prevent infinite redirect loop - only redirect if user's role doesn't match
-    const dashboardMap = { admin: '/admin', hr: '/hr', employee: '/employee' };
+    const dashboardMap = { superadmin: '/superadmin', admin: '/admin', hr: '/hr', employee: '/employee' };
     const targetDashboard = dashboardMap[user.role] || '/login';
     // Add a small delay to prevent rapid re-renders
     return <Navigate to={targetDashboard} replace />;
@@ -27,7 +27,7 @@ export const PublicRoute = () => {
 
   if (loading) return <LoadingSpinner fullScreen />;
   if (user) {
-    const dashboardMap = { admin: '/admin', hr: '/hr', employee: '/employee' };
+    const dashboardMap = { superadmin: '/superadmin', admin: '/admin', hr: '/hr', employee: '/employee' };
     return <Navigate to={dashboardMap[user.role] || '/login'} replace />;
   }
 

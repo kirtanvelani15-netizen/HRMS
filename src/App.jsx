@@ -169,6 +169,14 @@ const App = () => (
       </Route>
     </Route>
 
+    {/* Superadmin routes */}
+    <Route element={<ProtectedRoute roles={['superadmin']} />}>
+      <Route element={<DashboardLayout />}>
+        <Route path="/superadmin" element={<Companies />} />
+        <Route path="/superadmin/companies" element={<Companies />} />
+      </Route>
+    </Route>
+
     {/* Fallback */}
     <Route path="/" element={<Navigate to="/login" replace />} />
     <Route path="*" element={<Navigate to="/login" replace />} />
