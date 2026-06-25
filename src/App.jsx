@@ -70,7 +70,7 @@ const App = () => (
     </Route>
 
     {/* Admin routes */}
-    <Route element={<ProtectedRoute roles={['admin']} />}>
+    <Route element={<ProtectedRoute roles={['admin', 'superadmin']} />}>
       <Route element={<DashboardLayout />}>
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/manage-hr" element={<ManageHR />} />

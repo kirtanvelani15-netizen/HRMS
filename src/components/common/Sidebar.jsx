@@ -218,6 +218,7 @@ const employeeMenu = [
 
 const superadminMenu = [
   { label: 'Companies', icon: FiShield, to: '/superadmin/companies' },
+  ...adminMenu.filter(item => !item.superAdminOnly),
 ];
 
 const menuMap = { superadmin: superadminMenu, admin: adminMenu, hr: hrMenu, employee: employeeMenu };
