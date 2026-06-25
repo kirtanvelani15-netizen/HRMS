@@ -20,6 +20,7 @@ const RupeeIcon = ({ size = 18 }) => (
 
 /* ── Role accents ─────────────────────────────────────── */
 const ROLE_ACCENT = {
+  superadmin: { from: '#f59e0b', to: '#d97706', glow: 'rgba(245,158,11,0.3)', light: '#fffbeb', lightText: '#b45309' },
   admin:    { from: '#6366f1', to: '#4f46e5', glow: 'rgba(99,102,241,0.3)',  light: '#eef2ff', lightText: '#4338ca' },
   hr:       { from: '#8b5cf6', to: '#7c3aed', glow: 'rgba(139,92,246,0.3)', light: '#f5f3ff', lightText: '#6d28d9' },
   employee: { from: '#0ea5e9', to: '#0284c7', glow: 'rgba(14,165,233,0.3)', light: '#f0f9ff', lightText: '#0369a1' },
@@ -215,7 +216,11 @@ const employeeMenu = [
   { label: 'Settings',   icon: FiSettings,  to: '/employee/settings' },
 ];
 
-const menuMap = { admin: adminMenu, hr: hrMenu, employee: employeeMenu };
+const superadminMenu = [
+  { label: 'Companies', icon: FiShield, to: '/superadmin/companies' },
+];
+
+const menuMap = { superadmin: superadminMenu, admin: adminMenu, hr: hrMenu, employee: employeeMenu };
 
 /* ── Floating submenu for collapsed groups ────────────── */
 const FloatingSubmenu = ({ label, children, anchorRef, onClose, dark, accent }) => {
