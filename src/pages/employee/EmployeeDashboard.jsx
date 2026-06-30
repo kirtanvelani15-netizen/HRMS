@@ -42,7 +42,7 @@ const SectionCard = ({ title, children, action }) => (
 );
 
 const EmployeeDashboard = () => {
-  const { user } = useAuth();
+  const { user, hasModule } = useAuth();
   const [summary, setSummary] = useState(null);
   const [leaves, setLeaves] = useState([]);
   const [salaries, setSalaries] = useState([]);
@@ -139,7 +139,7 @@ const EmployeeDashboard = () => {
       <TodayPunchWidget record={todayAttendance} />
 
       {/* Work Timer */}
-      <WorklogTimer todayAttendance={todayAttendance} />
+      {hasModule('worklog') && <WorklogTimer todayAttendance={todayAttendance} />}
 
       {/* Reporting Manager */}
       {reportingManager && (

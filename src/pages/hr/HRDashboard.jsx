@@ -135,7 +135,7 @@ const ProgressRing = ({ size = 130, stroke = 12 }) => {
 
 /* ══════════════════════════════════════════════════════════════ */
 const HRDashboard = () => {
-  const { user } = useAuth();
+  const { user, hasModule } = useAuth();
   const navigate = useNavigate();
   const [overview, setOverview] = useState(null);
   const [pendingLeaves, setPendingLeaves] = useState([]);
@@ -437,9 +437,11 @@ const HRDashboard = () => {
       </div>
 
       {/* ═══ WORK TIMER ═════════════════════════════════════════ */}
-      <div className="px-6 pb-4">
-        <WorklogTimer todayAttendance={todayAttendance} onRefresh={() => window.location.reload()} />
-      </div>
+      {hasModule('worklog') && (
+        <div className="px-6 pb-4">
+          <WorklogTimer todayAttendance={todayAttendance} onRefresh={() => window.location.reload()} />
+        </div>
+      )}
 
       {/* ═══ MAIN GRID ═════════════════════════════════════════ */}
       <div className="px-6 pb-6 grid grid-cols-12 gap-5">
