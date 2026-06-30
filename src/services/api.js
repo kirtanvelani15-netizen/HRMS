@@ -157,7 +157,8 @@ export const payrollAPI = {
     api.get(`/payroll/structure/${employeeId}/download`, { responseType: 'blob' }).then(res => {
       const url = URL.createObjectURL(res.data);
       const a = document.createElement('a'); a.href = url; a.download = filename || 'CTC_Structure.pdf'; a.click(); URL.revokeObjectURL(url);
-    })
+    }),
+  calculateCompliance: (params) => api.get('/payroll/compliance/calculate', { params })
 };
 
 export const notificationAPI = {

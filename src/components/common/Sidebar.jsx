@@ -122,9 +122,10 @@ const hrMenu = [
   {
     label: 'Finance', icon: FiCreditCard, group: true, module: 'finance',
     children: [
-      { label: 'Salary',        to: '/hr/salary' },
-      { label: 'Salary Master', to: '/hr/salary-master' },
-      { label: 'Expenses',      to: '/hr/expenses' },
+      { label: 'Salary',               to: '/hr/salary' },
+      { label: 'Salary Master',        to: '/hr/salary-master' },
+      { label: 'Expenses',             to: '/hr/expenses' },
+      { label: 'Statutory Compliance', to: '/hr/statutory-compliance' },
     ]
   },
   // ── Regular use ──

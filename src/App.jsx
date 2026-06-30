@@ -23,6 +23,7 @@ import PerformanceOverview from './pages/admin/PerformanceOverview';
 import HRDashboard from './pages/hr/HRDashboard';
 import Onboarding from './pages/shared/Onboarding';
 import SalaryMaster from './pages/hr/SalaryMaster';
+import StatutoryCompliance from './pages/hr/StatutoryCompliance';
 import HRChatPage from './pages/hr/HRChatPage';
 
 // Employee pages
@@ -129,6 +130,7 @@ const App = () => (
         <Route path="/hr/holidays" element={<Holidays />} />
         <Route path="/hr/directory" element={<Directory />} />
         <Route path="/hr/expenses" element={<Expenses />} />
+        <Route path="/hr/statutory-compliance" element={<StatutoryCompliance />} />
         <Route path="/hr/performance/goals" element={<PerformanceGoals />} />
         <Route path="/hr/performance/reviews" element={<PerformanceReviews />} />
         <Route element={<ModuleRoute moduleKey="worklog" />}>
