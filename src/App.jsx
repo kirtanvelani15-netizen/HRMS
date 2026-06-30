@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { ProtectedRoute, PublicRoute } from './routes/ProtectedRoute';
+import { ProtectedRoute, PublicRoute, ModuleRoute } from './routes/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
 import AuthLayout from './layouts/AuthLayout';
 
@@ -94,10 +94,12 @@ const App = () => (
         <Route path="/admin/performance/overview" element={<PerformanceOverview />} />
         <Route path="/admin/performance/goals" element={<PerformanceGoals />} />
         <Route path="/admin/performance/reviews" element={<PerformanceReviews />} />
-        <Route path="/admin/worklog/log" element={<WorkLog />} />
-        <Route path="/admin/worklog/projects" element={<WorklogProjects />} />
-        <Route path="/admin/worklog/approvals" element={<WorklogApprovals />} />
-        <Route path="/admin/worklog/reports" element={<WorklogReports />} />
+        <Route element={<ModuleRoute moduleKey="worklog" />}>
+          <Route path="/admin/worklog/log" element={<WorkLog />} />
+          <Route path="/admin/worklog/projects" element={<WorklogProjects />} />
+          <Route path="/admin/worklog/approvals" element={<WorklogApprovals />} />
+          <Route path="/admin/worklog/reports" element={<WorklogReports />} />
+        </Route>
         <Route path="/admin/recruitment" element={<Recruitment />} />
         <Route path="/admin/training" element={<Training />} />
         <Route path="/admin/shifts" element={<ShiftRoster />} />
@@ -129,9 +131,11 @@ const App = () => (
         <Route path="/hr/expenses" element={<Expenses />} />
         <Route path="/hr/performance/goals" element={<PerformanceGoals />} />
         <Route path="/hr/performance/reviews" element={<PerformanceReviews />} />
-        <Route path="/hr/worklog/log" element={<WorkLog />} />
-        <Route path="/hr/worklog/approvals" element={<WorklogApprovals />} />
-        <Route path="/hr/worklog/reports" element={<WorklogReports />} />
+        <Route element={<ModuleRoute moduleKey="worklog" />}>
+          <Route path="/hr/worklog/log" element={<WorkLog />} />
+          <Route path="/hr/worklog/approvals" element={<WorklogApprovals />} />
+          <Route path="/hr/worklog/reports" element={<WorklogReports />} />
+        </Route>
         <Route path="/hr/recruitment" element={<Recruitment />} />
         <Route path="/hr/training" element={<Training />} />
         <Route path="/hr/shifts" element={<ShiftRoster />} />
@@ -161,8 +165,10 @@ const App = () => (
         <Route path="/employee/expenses" element={<Expenses />} />
         <Route path="/employee/performance/goals" element={<PerformanceGoals />} />
         <Route path="/employee/performance/reviews" element={<PerformanceReviews />} />
-        <Route path="/employee/worklog/log" element={<WorkLog />} />
-        <Route path="/employee/worklog/approvals" element={<WorklogApprovals />} />
+        <Route element={<ModuleRoute moduleKey="worklog" />}>
+          <Route path="/employee/worklog/log" element={<WorkLog />} />
+          <Route path="/employee/worklog/approvals" element={<WorklogApprovals />} />
+        </Route>
         <Route path="/employee/grievances" element={<Grievances />} />
         <Route path="/employee/shifts" element={<ShiftRoster />} />
         <Route path="/employee/letters" element={<LetterGenerator />} />
