@@ -38,10 +38,10 @@ const ManageHR = () => {
 
   const fetchEmployees = async () => {
     try {
-      const res = await employeeAPI.getAll();
+      const res = await employeeAPI.getAll({ limit: 200 });
       setEmployees(res.data?.data || res.data?.employees || []);
-    } catch {
-      // non-critical
+    } catch (err) {
+      console.error('fetchEmployees error:', err?.response?.data || err.message);
     }
   };
 
