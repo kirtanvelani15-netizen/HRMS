@@ -60,7 +60,7 @@ const Departments = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="page-title">Departments</h1>
-          <p className="text-gray-500 text-sm">{departments.length} departments</p>
+          <p className="text-gray-500 text-sm">{departments.length} {departments.length === 1 ? 'Department' : 'Departments'}</p>
         </div>
         {user.role === 'admin' && (
           <button onClick={openAdd} className="btn-primary flex items-center gap-2">
@@ -94,7 +94,7 @@ const Departments = () => {
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
                   <FiUsers className="w-4 h-4" />
-                  <span className="text-sm font-medium">{dept.employeeCount || 0} employees</span>
+                  <span className="text-sm font-medium">{dept.employeeCount || 0} {(dept.employeeCount || 0) === 1 ? 'Employee' : 'Employees'}</span>
                 </div>
                 {dept.location && <span className="text-xs text-gray-400">📍 {dept.location}</span>}
               </div>
