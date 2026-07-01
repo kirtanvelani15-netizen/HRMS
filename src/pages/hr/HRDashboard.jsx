@@ -17,26 +17,6 @@ import {
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 
-/* ─── salary helpers ─────────────────────────────────────────── */
-const smCalcPF = (basic) => basic >= 15000 ? 1800 : Math.round(basic * 0.12);
-const smCalcAll = (monthlyCTC, manual) => {
-  const m = Number(monthlyCTC) || 0;
-  const basic = Math.round(m * 0.5);
-  const hra = Math.round(basic * 0.2);
-  const travelling = Math.round(basic * 0.1);
-  const bonus = Math.round(basic * 0.05);
-  const conveyance = Number(manual.conveyance) || 0;
-  const childEdu = Number(manual.childEducation) || 0;
-  const medical = Number(manual.medical) || 0;
-  const telephone = Number(manual.telephone) || 0;
-  const sumComponents = basic + hra + conveyance + childEdu + travelling + medical + telephone + bonus;
-  const specialAllowance = Math.max(0, m - sumComponents);
-  const grossTotal = sumComponents + specialAllowance;
-  const pf = smCalcPF(basic);
-  const professionalTax = 200;
-  return { basic, hra, travelling, bonus, conveyance, childEdu, medical, telephone, specialAllowance, grossTotal, pf, professionalTax };
-};
-const smFmt = (n) => '₹' + Number(n || 0).toLocaleString('en-IN');
 
 /* ─── calendar helpers ───────────────────────────────────────── */
 const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -144,7 +124,7 @@ const HRDashboard = () => {
   const [rejectReason, setRejectReason] = useState('');
   const [ctcModal, setCtcModal] = useState(null);
   const [ctcValue, setCtcValue] = useState('');
-  const [ctcManual, setCtcManual] = useState({ conveyance: 0, childEducation: 0, medical: 0, telephone: 0 });
+  const [ctcTemplate, setCtcTemplate] = useState(null);
   const [ctcSaving, setCtcSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [todayAttendance, setTodayAttendance] = useState(null);
@@ -215,19 +195,12 @@ const HRDashboard = () => {
 
   const openCtcModal = async (notification) => {
     setCtcValue('');
-    setCtcManual({ conveyance: 0, childEducation: 0, medical: 0, telephone: 0 });
+    setCtcTemplate(null);
     setCtcModal(notification);
     try {
       const res = await payrollAPI.getTemplates({ active: true });
       const t = res.data?.data?.[0];
-      if (t) {
-        setCtcManual({
-          conveyance: t.components?.conveyance?.value ?? 0,
-          childEducation: t.components?.childEducation?.value ?? 0,
-          medical: t.components?.medical?.value ?? 0,
-          telephone: t.components?.telephoneInternet?.value ?? 0,
-        });
-      }
+      if (t) setCtcTemplate(t);
     } catch (_) {}
   };
 
@@ -235,31 +208,21 @@ const HRDashboard = () => {
     if (!ctcValue || Number(ctcValue) <= 0) return toast.error('Enter a valid monthly CTC');
     const empId = ctcModal?.employee?._id;
     if (!empId) return toast.error('Employee not found');
+    if (!ctcTemplate?._id) return toast.error('No salary master configured. Please set up Salary Master first.');
     setCtcSaving(true);
     try {
-      const c = smCalcAll(ctcValue, ctcManual);
-      const toFixed = (v) => ({ calculationType: 'fixed', value: v, percentageOf: 'basicSalary' });
-      await payrollAPI.saveStructure({
+      // Use annual CTC (monthly × 12) for assignTemplateToEmployee
+      await payrollAPI.assignTemplateToEmployee({
         employee: empId,
-        basicSalary: c.basic,
+        template: ctcTemplate._id,
+        ctc: Number(ctcValue) * 12,
         overtimeRate: 0,
-        earnings: {
-          hra: toFixed(c.hra), conveyance: toFixed(c.conveyance),
-          childEducation: toFixed(c.childEdu), lta: toFixed(c.travelling),
-          medical: toFixed(c.medical), telephoneInternet: toFixed(c.telephone),
-          bonus: toFixed(c.bonus), specialAllowance: toFixed(c.specialAllowance), pli: toFixed(0),
-        },
-        employerContributions: {
-          pf: { calculationType: 'percentage', value: 12, percentageOf: 'basicSalary' },
-          esi: toFixed(0), statutoryBenefits: toFixed(200), retentionBonus: toFixed(0),
-        },
       });
       if (ctcModal?._id) {
         await notificationAPI.markRead(ctcModal._id);
         setNotifications(prev => prev.map(n => n._id === ctcModal._id ? { ...n, isRead: true } : n));
       }
       toast.success('Salary structure saved for ' + (ctcModal?.employee?.firstName || 'employee'));
-      const empId = ctcModal?.employee?._id;
       const empCode = ctcModal?.employee?.employeeId || empId;
       const empName = `${ctcModal?.employee?.firstName || ''}_${ctcModal?.employee?.lastName || ''}`.trim();
       payrollAPI.downloadCtcStructure(empId, `CTC_${empName}_${empCode}.pdf`).catch(() => {});
@@ -866,7 +829,6 @@ const HRDashboard = () => {
 
       {/* ═══ CTC SETUP MODAL ══════════════════════════════════ */}
       {(() => {
-        const c = smCalcAll(ctcValue, ctcManual);
         const empName = `${ctcModal?.employee?.firstName || ''} ${ctcModal?.employee?.lastName || ''}`.trim();
         return (
           <Modal isOpen={!!ctcModal} onClose={() => setCtcModal(null)}
@@ -880,69 +842,37 @@ const HRDashboard = () => {
               </>
             }>
             <div className="space-y-5">
+              {!ctcTemplate && (
+                <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
+                  No Salary Master configured. Please set up your company's salary components in <strong>Salary Master</strong> before assigning CTC.
+                </div>
+              )}
               <div className="rounded-xl border-2 border-indigo-300 bg-indigo-50 p-4">
                 <label className="block text-sm font-semibold text-indigo-700 mb-1">Monthly CTC (₹) *</label>
                 <input type="text" inputMode="numeric" placeholder="e.g. 50,000" autoFocus
                   value={ctcValue ? Number(ctcValue).toLocaleString('en-IN') : ''}
                   onChange={e => { const raw = e.target.value.replace(/,/g, ''); if (/^\d*$/.test(raw)) setCtcValue(raw); }}
                   className="input-field text-lg font-semibold" />
-                {Number(ctcValue) > 0 && (
-                  <p className="text-xs text-indigo-500 mt-1.5">Basic = {smFmt(c.basic)} · Gross = {smFmt(c.grossTotal)} · PF = {smFmt(c.pf)}</p>
+                {Number(ctcValue) > 0 && ctcTemplate && (
+                  <p className="text-xs text-indigo-500 mt-1.5">
+                    Components will be calculated from your Salary Master template: <strong>{ctcTemplate.name}</strong>
+                  </p>
                 )}
               </div>
-              <div>
-                <p className="text-xs font-semibold text-yellow-700 uppercase tracking-wide mb-2">Manual Components</p>
-                <div className="grid grid-cols-2 gap-3">
-                  {[['conveyance', 'Conveyance'], ['childEducation', 'Child Education'], ['medical', 'Medical'], ['telephone', 'Telephone']].map(([key, label]) => (
-                    <div key={key}>
-                      <label className="label text-xs">{label}</label>
-                      <input type="text" inputMode="numeric" value={ctcManual[key] ? Number(ctcManual[key]).toLocaleString('en-IN') : ''}
-                        onChange={e => { const raw = e.target.value.replace(/,/g, ''); if (/^\d*$/.test(raw)) setCtcManual(p => ({ ...p, [key]: Number(raw) || 0 })); }}
-                        className="input-field text-sm" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {Number(ctcValue) > 0 && (
+              {ctcTemplate && (
                 <div>
                   <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-2 flex items-center gap-1">
-                    <FiLock className="w-3 h-3" /> Auto-Calculated
+                    <FiLock className="w-3 h-3" /> Components from Salary Master
                   </p>
                   <div className="rounded-xl border border-gray-200 divide-y divide-gray-100 overflow-hidden">
-                    {[
-                      ['Basic Salary', smFmt(c.basic), '50% of CTC'],
-                      ['HRA', smFmt(c.hra), '20% of Basic'],
-                      ['Travelling', smFmt(c.travelling), '10% of Basic'],
-                      ['Bonus', smFmt(c.bonus), '5% of Basic'],
-                      ['Special Allowance', smFmt(c.specialAllowance), 'CTC − all others'],
-                      ['Employee PF', smFmt(c.pf), c.basic >= 15000 ? 'Fixed ₹1,800' : '12% of Basic'],
-                      ['Professional Tax', smFmt(c.professionalTax), 'Fixed ₹200/month'],
-                    ].map(([label, value, formula]) => (
-                      <div key={label} className="flex items-center justify-between px-4 py-2.5 bg-gray-50/60">
-                        <div>
-                          <p className="text-sm text-gray-700">{label}</p>
-                          <p className="text-xs text-gray-400">{formula}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-gray-900">{value}</span>
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-blue-100 text-blue-600">Auto</span>
-                        </div>
+                    {(ctcTemplate.components || []).map(c => (
+                      <div key={c.key} className="flex items-center justify-between px-4 py-2.5 bg-gray-50/60">
+                        <p className="text-sm text-gray-700">{c.name}</p>
+                        <span className="text-xs px-1.5 py-0.5 rounded bg-blue-100 text-blue-600">
+                          {c.calculationType === 'remaining' ? 'Remaining' : c.calculationType === 'percentage' ? `${c.value}% of ${c.percentageOf === 'ctc' ? 'CTC' : 'Basic'}` : `₹${c.value}`}
+                        </span>
                       </div>
                     ))}
-                  </div>
-                  <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-                    <div className="rounded-lg bg-emerald-50 px-3 py-2">
-                      <p className="text-xs text-gray-500">Gross</p>
-                      <p className="text-sm font-bold text-emerald-600">{smFmt(c.grossTotal)}</p>
-                    </div>
-                    <div className="rounded-lg bg-red-50 px-3 py-2">
-                      <p className="text-xs text-gray-500">Deductions</p>
-                      <p className="text-sm font-bold text-red-500">−{smFmt(c.pf * 2 + c.professionalTax)}</p>
-                    </div>
-                    <div className="rounded-lg bg-indigo-600 px-3 py-2 text-white">
-                      <p className="text-xs opacity-75">Net</p>
-                      <p className="text-sm font-bold">{smFmt(c.grossTotal - c.pf * 2 - c.professionalTax)}</p>
-                    </div>
                   </div>
                 </div>
               )}
