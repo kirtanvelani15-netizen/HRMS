@@ -129,7 +129,7 @@ const EmployeeDashboard = () => {
             <div className="text-right">
               <p className="text-indigo-200 text-xs">This month</p>
               <p className="text-2xl font-bold">{summary?.totalWorkHours || 0}h</p>
-              <p className="text-indigo-200 text-xs">worked</p>
+              <p className="text-indigo-200 text-xs">Worked</p>
             </div>
           </div>
         </div>

@@ -327,7 +327,7 @@ const Salary = () => {
           </div>
           <div>
             <p className="text-xs text-gray-500">Pending</p>
-            <p className="text-lg font-bold text-amber-600">{monthlySummary.pending} <span className="text-xs font-normal text-gray-400">records</span></p>
+            <p className="text-lg font-bold text-amber-600">{monthlySummary.pending} <span className="text-xs font-normal text-gray-400">Records</span></p>
           </div>
         </div>
       )}

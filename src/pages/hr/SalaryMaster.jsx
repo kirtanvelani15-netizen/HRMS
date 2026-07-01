@@ -324,7 +324,7 @@ const ComponentRow = ({ comp, isLocked, onChange, onDelete, previewValue }) => {
           className="w-20 text-right text-sm border border-gray-200 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-1 focus:ring-primary-400 outline-none disabled:opacity-60 disabled:cursor-not-allowed"
         />
       ) : (
-        <span className="w-20 text-right text-xs text-gray-400 italic">auto</span>
+        <span className="w-20 text-right text-xs text-gray-400 italic">Auto</span>
       )}
 
       <span className="w-20 text-right text-sm font-semibold text-primary-600 dark:text-primary-400 tabular-nums">

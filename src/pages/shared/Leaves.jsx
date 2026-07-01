@@ -198,7 +198,7 @@ const Leaves = () => {
                 }`}>
                   <span className="capitalize">{type}</span>
                   <span className="font-bold">{days ?? 0}</span>
-                  <span className="text-gray-400">days</span>
+                  <span className="text-gray-400">Days</span>
                 </div>
               );
             })}
