@@ -82,6 +82,8 @@ const Login = () => {
     if (disabled) return;
     const required = ['firstName', 'lastName', 'email', 'phone', 'password', 'gender', 'designation'];
     if (required.some(f => !signupForm[f])) return toast.error('Please fill in all required fields');
+    const digits = signupForm.phone.replace(/\D/g, '');
+    if (digits.length < 10) return toast.error('Please enter a valid 10-digit phone number');
     if (signupForm.password.length < 6) return toast.error('Password must be at least 6 characters');
     if (signupForm.password !== signupForm.confirmPassword) return toast.error('Passwords do not match');
     setLoading(true);
