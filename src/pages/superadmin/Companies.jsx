@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
-import { FiPlus, FiEdit2, FiToggleLeft, FiToggleRight, FiUserPlus, FiX, FiCopy, FiRefreshCw, FiLink } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiToggleLeft, FiToggleRight, FiUserPlus, FiX, FiCopy, FiRefreshCw, FiLink, FiUsers } from 'react-icons/fi';
 
 const ALL_MODULES = [
   { key: 'attendance',  label: 'Attendance & Leaves' },
@@ -256,10 +256,14 @@ const Companies = () => {
             <div key={company._id} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 shadow-sm">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-semibold text-gray-900 dark:text-white">{company.name}</h3>
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${company.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>
                       {company.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                    <span className="flex items-center gap-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded-full">
+                      <FiUsers className="w-3 h-3" />
+                      {company.employeeCount ?? 0} employee{(company.employeeCount ?? 0) !== 1 ? 's' : ''}
                     </span>
                   </div>
                   <p className="text-xs text-gray-400 mt-0.5">slug: {company.slug}</p>
