@@ -306,7 +306,7 @@ const Employees = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="page-title">Employees</h1>
-          <p className="text-gray-500 text-sm">{pagination.total} total employees</p>
+          <p className="text-gray-500 text-sm">{pagination.total} {pagination.total === 1 ? 'Employee' : 'Employees'}</p>
         </div>
         <div className="flex items-center gap-2">
           {activeTab === 'manage' && (
