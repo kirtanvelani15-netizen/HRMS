@@ -415,21 +415,6 @@ const Attendance = () => {
                 </>
               )}
 
-              <select value={filters.status} onChange={e => setFilters(f => ({ ...f, status: e.target.value, page: 1 }))} className="input-field w-36">
-                <option value="">All Status</option>
-                {STATUS_OPTS.map(s => <option key={s} value={s} className="capitalize">{s}</option>)}
-              </select>
-
-              <select value={filters.department} onChange={e => setFilters(f => ({ ...f, department: e.target.value, page: 1 }))} className="input-field w-44">
-                <option value="">All Departments</option>
-                {departments.map(d => <option key={d._id} value={d._id}>{d.name}</option>)}
-              </select>
-
-              <select value={filters.employee} onChange={e => setFilters(f => ({ ...f, employee: e.target.value, search: '', page: 1 }))} className="input-field w-48">
-                <option value="">All Employees</option>
-                {employees.map(e => <option key={e._id} value={e._id}>{e.firstName} {e.lastName}</option>)}
-              </select>
-
               {hasActiveFilter && (
                 <button onClick={() => setFilters(f => ({ ...f, search: '', status: '', employee: '', department: '', page: 1 }))} className="btn-secondary text-sm">Clear</button>
               )}
