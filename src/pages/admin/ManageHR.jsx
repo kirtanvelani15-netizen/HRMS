@@ -147,7 +147,7 @@ const ManageHR = () => {
             <input value={search} onChange={e => setSearch(e.target.value)}
               className="input-field pl-9" placeholder="Search HR staff..." />
           </div>
-          <span className="ml-auto text-sm text-gray-500">{filtered.length} staff</span>
+          <span className="ml-auto text-sm text-gray-500">{filtered.length} Staff</span>
         </div>
 
         {loading ? <LoadingSpinner /> : filtered.length === 0 ? (
