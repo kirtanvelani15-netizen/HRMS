@@ -437,6 +437,11 @@ const SalaryMaster = () => {
     if (unlocked) loadTemplate();
   }, [unlocked, loadTemplate]);
 
+  // Clear session on unmount so navigating away + back re-prompts password
+  useEffect(() => {
+    return () => { sessionStorage.removeItem(SESSION_KEY); };
+  }, []);
+
   // Show password gate if pin status not loaded yet
   if (pinStatus === null) {
     return (
