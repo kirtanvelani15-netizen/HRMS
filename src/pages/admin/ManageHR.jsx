@@ -134,7 +134,7 @@ const ManageHR = () => {
           </div>
           <div>
             <p className="font-semibold text-gray-900 dark:text-white">HR Module Access</p>
-            <p className="text-sm text-gray-600 dark:text-gray-300">HR staff can manage employees, attendance, leaves, payroll, and notices. As Super Admin you can add, deactivate, reset passwords, or remove HR accounts.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">HR Staff can manage Employees, Attendance, Leave Requests, Payroll, and Notices. As a Super Admin, you can add, deactivate, reset account passwords, or remove HR Accounts.</p>
           </div>
         </div>
       </div>
