@@ -127,9 +127,9 @@ const Training = () => {
           <h1 className="page-title">Training & Learning</h1>
           <p className="text-gray-500 text-sm">{tab === 'courses' ? `${courses.length} courses` : `${enrollments.length} enrollments`}</p>
         </div>
-        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
-          {!isEmployee && <button onClick={() => { setEditCourse(null); setCourseForm({ title: '', description: '', category: '', duration: '', instructor: '', materials: '' }); setShowCourseModal(true); }} className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-none"><FiPlus className="w-4 h-4" /> New Course</button>}
-          {!isEmployee && <button onClick={() => { setEnrollForm({ course: '', employee: '' }); setShowEnrollModal(true); }} className="btn-secondary flex items-center justify-center gap-2 flex-1 sm:flex-none"><FiBook className="w-4 h-4" /> Enroll</button>}
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+          {!isEmployee && <button onClick={() => { setEditCourse(null); setCourseForm({ title: '', description: '', category: '', duration: '', instructor: '', materials: '' }); setShowCourseModal(true); }} className="btn-primary flex items-center justify-center gap-2 sm:flex-none"><FiPlus className="w-4 h-4" /> New Course</button>}
+          {!isEmployee && <button onClick={() => { setEnrollForm({ course: '', employee: '' }); setShowEnrollModal(true); }} className="btn-secondary flex items-center justify-center gap-2 sm:flex-none"><FiBook className="w-4 h-4" /> Enroll</button>}
         </div>
       </div>
 

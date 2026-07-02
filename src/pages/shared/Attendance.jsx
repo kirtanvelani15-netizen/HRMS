@@ -291,17 +291,17 @@ const Attendance = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="page-title">Attendance</h1>
         {!isEmployee && (
-          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+          <div className="grid grid-cols-1 sm:flex sm:items-center gap-2 w-full sm:w-auto">
             <button onClick={() => { setImportForm({ file: null, dateMode: 'sheet', date: new Date().toISOString().slice(0, 10) }); setImportResult(null); setShowImportModal(true); }}
-              className="btn-secondary flex items-center gap-2 flex-1 sm:flex-none justify-center">
+              className="btn-secondary flex items-center gap-2 justify-center sm:flex-none">
               <FiUpload className="w-4 h-4" /> Import Excel
             </button>
             <button onClick={() => { setBulkForm({ date: filters.date, status: 'present', checkIn: '', checkOut: '' }); setBulkSelectedIds([]); setBulkResult(null); setShowBulkModal(true); }}
-              className="btn-secondary flex items-center gap-2 text-purple-700 border-purple-200 hover:bg-purple-50 flex-1 sm:flex-none justify-center">
+              className="btn-secondary flex items-center gap-2 text-purple-700 border-purple-200 hover:bg-purple-50 justify-center sm:flex-none">
               <FiLayers className="w-4 h-4" /> Bulk Mark
             </button>
             <button onClick={() => { setEditRecord(null); setForm({ employee: '', date: new Date().toISOString().slice(0, 10), status: 'present', checkIn: '', checkOut: '', notes: '' }); setShowModal(true); }}
-              className="btn-primary flex items-center gap-2 flex-1 sm:flex-none justify-center">
+              className="btn-primary flex items-center gap-2 justify-center sm:flex-none">
               <FiPlus className="w-4 h-4" /> Mark Attendance
             </button>
           </div>

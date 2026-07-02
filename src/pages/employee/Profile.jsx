@@ -65,9 +65,9 @@ const Profile = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="page-title">My Profile</h1>
         {editing ? (
-          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
-            <button onClick={() => setEditing(false)} className="btn-secondary text-sm flex-1 sm:flex-none justify-center">Cancel</button>
-            <button onClick={handleSave} disabled={saving} className="btn-primary text-sm flex items-center gap-2 flex-1 sm:flex-none justify-center">
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+            <button onClick={() => setEditing(false)} className="btn-secondary text-sm justify-center sm:flex-none">Cancel</button>
+            <button onClick={handleSave} disabled={saving} className="btn-primary text-sm flex items-center gap-2 justify-center sm:flex-none">
               <FiSave className="w-4 h-4" /> {saving ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
