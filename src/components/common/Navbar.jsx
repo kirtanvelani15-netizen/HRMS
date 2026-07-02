@@ -129,7 +129,7 @@ const Navbar = ({ onMenuClick }) => {
           <FiMenu size={18} />
         </button>
         {pageTitle ? (
-          <h1 className={`text-[15px] font-semibold truncate ${dark ? 'text-white' : 'text-gray-900'}`}>
+          <h1 className={`text-[19px] font-bold tracking-tight truncate ${dark ? 'text-white' : 'text-gray-900'}`}>
             {pageTitle}
           </h1>
         ) : (
