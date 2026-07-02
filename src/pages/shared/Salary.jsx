@@ -69,6 +69,7 @@ const Salary = () => {
   const [ctcInput, setCtcInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [downloadingTemplate, setDownloadingTemplate] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [markingPaid, setMarkingPaid] = useState(false);
   const [downloading, setDownloading] = useState(null);
@@ -179,6 +180,15 @@ const Salary = () => {
     if (!window.confirm('Delete this salary record?')) return;
     try { await salaryAPI.delete(id); toast.success('Deleted'); fetchSalaries(); }
     catch (err) { toast.error('Failed'); }
+  };
+
+  const handleDownloadTemplate = async () => {
+    setDownloadingTemplate(true);
+    try {
+      const res = await salaryAPI.downloadImportTemplate();
+      downloadBlob(res.data, 'salary-import-template.xlsx');
+    } catch (_) { toast.error('Template download failed'); }
+    finally { setDownloadingTemplate(false); }
   };
 
   const handleImport = async () => {
@@ -532,7 +542,14 @@ const Salary = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="label">Excel File</label>
+            <div className="flex items-center justify-between">
+              <label className="label mb-0">Excel File</label>
+              <button onClick={handleDownloadTemplate} disabled={downloadingTemplate}
+                className="flex items-center gap-1 text-xs text-primary-600 hover:underline font-medium disabled:opacity-50">
+                <FiDownload className="w-3 h-3" />
+                {downloadingTemplate ? 'Downloading...' : 'Download Template'}
+              </button>
+            </div>
             <input type="file" accept=".xls,.xlsx" onChange={e => setImportForm({ ...importForm, file: e.target.files?.[0] || null })} className="input-field" />
           </div>
           <div className="grid grid-cols-2 gap-3">

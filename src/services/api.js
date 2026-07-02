@@ -96,6 +96,7 @@ export const salaryAPI = {
   getOverview: (params) => api.get('/salary/overview', { params }),
   create: (data) => api.post('/salary', data),
   importExcel: (formData) => api.post('/salary/import-excel', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  downloadImportTemplate: () => api.get('/salary/import-template', { responseType: 'blob' }),
   update: (id, data) => api.put(`/salary/${id}`, data),
   delete: (id) => api.delete(`/salary/${id}`),
   downloadPayslip: (id) => api.get(`/salary/${id}/payslip`, { responseType: 'blob' }),
