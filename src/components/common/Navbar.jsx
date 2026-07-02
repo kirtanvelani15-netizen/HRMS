@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { notificationAPI } from '../../services/api';
 import {
-  FiBell, FiCheck, FiMessageSquare, FiSun, FiMoon,
+  FiBell, FiCheck, FiMessageSquare, FiSun, FiMoon, FiMenu,
 } from 'react-icons/fi';
 
 const ROUTE_LABELS = {
@@ -117,8 +117,17 @@ const Navbar = ({ onMenuClick }) => {
         boxShadow: dark ? '0 1px 12px rgba(0,0,0,0.35)' : '0 1px 8px rgba(0,0,0,0.05)',
       }}
     >
-      {/* ── Left: page title ── */}
-      <div className="min-w-0">
+      {/* ── Left: mobile menu + page title ── */}
+      <div className="flex items-center gap-2 min-w-0">
+        <button
+          onClick={onMenuClick}
+          title="Menu"
+          className={`lg:hidden w-8 h-8 shrink-0 rounded-lg flex items-center justify-center transition-all duration-150 ${
+            dark ? 'text-gray-300 hover:text-white hover:bg-white/8' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+          }`}
+        >
+          <FiMenu size={18} />
+        </button>
         {pageTitle ? (
           <h1 className={`text-[15px] font-semibold truncate ${dark ? 'text-white' : 'text-gray-900'}`}>
             {pageTitle}
