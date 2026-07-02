@@ -140,7 +140,6 @@ const Expenses = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="page-title">Expense Claims</h1>
           <p className="text-gray-500 text-sm">{pagination.total} total claims</p>
         </div>
         {isEmployee && (

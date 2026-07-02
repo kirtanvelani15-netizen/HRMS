@@ -37,8 +37,6 @@ const MyAssets = () => {
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-      <h1 className="page-title">My Assigned Equipment</h1>
-
       {assets.length === 0 ? (
         <div className="card flex flex-col items-center justify-center p-12 text-gray-500 text-center">
           <FiBox className="w-16 h-16 mb-4 text-gray-300" />

@@ -28,10 +28,7 @@ const SystemAnalytics = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="page-title">System Analytics</h1>
-        <p className="text-gray-500 text-sm">Comprehensive view of all system data and trends</p>
-      </div>
+      <p className="text-gray-500 text-sm">Comprehensive view of all system data and trends</p>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

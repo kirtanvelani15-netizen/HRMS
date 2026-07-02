@@ -59,7 +59,6 @@ const Departments = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="page-title">Departments</h1>
           <p className="text-gray-500 text-sm">{departments.length} {departments.length === 1 ? 'Department' : 'Departments'}</p>
         </div>
         {user.role === 'admin' && (

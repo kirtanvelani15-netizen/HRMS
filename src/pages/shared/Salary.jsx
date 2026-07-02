@@ -249,7 +249,6 @@ const Salary = () => {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="page-title">Salary & Payroll</h1>
           <p className="text-gray-500 text-sm">{pagination.total} records</p>
         </div>
         {user.role === 'employee' && (

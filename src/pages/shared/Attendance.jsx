@@ -280,8 +280,7 @@ const Attendance = () => {
         </div>
       )}
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h1 className="page-title">Attendance</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3">
         {!isEmployee && (
           <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
             <button onClick={() => { setImportForm({ file: null, dateMode: 'sheet', date: new Date().toISOString().slice(0, 10) }); setImportResult(null); setShowImportModal(true); }}

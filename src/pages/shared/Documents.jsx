@@ -132,10 +132,7 @@ const Documents = () => {
     return (
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <h1 className="page-title">My Documents</h1>
-            <p className="text-gray-500 text-sm">{documents.length} documents</p>
-          </div>
+          <p className="text-gray-500 text-sm">{documents.length} documents</p>
           <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
             <button onClick={openUploadModal} className="btn-primary flex items-center gap-2 flex-1 sm:flex-none justify-center">
               <FiUpload className="w-4 h-4" /> Upload Document
@@ -175,7 +172,6 @@ const Documents = () => {
                 <FiChevronRight className="w-3.5 h-3.5" />
                 <span className="text-gray-700 dark:text-gray-200 font-medium">{openFolder.firstName} {openFolder.lastName}</span>
               </div>
-              <h1 className="page-title mt-0.5">{openFolder.firstName} {openFolder.lastName}</h1>
               <p className="text-gray-500 text-sm">{documents.length} documents</p>
             </div>
           </div>
@@ -215,10 +211,7 @@ const Documents = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h1 className="page-title">Documents</h1>
-          <p className="text-gray-500 text-sm">{employees.length} employees</p>
-        </div>
+        <p className="text-gray-500 text-sm">{employees.length} employees</p>
         <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
           <button onClick={openUploadModal} className="btn-primary flex items-center gap-2 flex-1 sm:flex-none justify-center">
             <FiUpload className="w-4 h-4" /> Upload Document

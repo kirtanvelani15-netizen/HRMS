@@ -188,8 +188,6 @@ const Settings = () => {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <h1 className="page-title">Settings</h1>
-
       {/* Tabs */}
       <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl w-fit">
         {tabs.map(({ id, label, icon: Icon }) => (

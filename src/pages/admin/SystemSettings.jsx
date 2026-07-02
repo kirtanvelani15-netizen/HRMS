@@ -105,9 +105,6 @@ const SystemSettings = () => {
 
       {/* Header */}
       <div>
-        <h1 className="page-title flex items-center gap-2">
-          <FiSettings className="text-indigo-600 w-6 h-6" /> System Settings
-        </h1>
         <p className="text-gray-500 text-sm mt-1">Configure company information, leave policy, and compliance rules</p>
       </div>
 

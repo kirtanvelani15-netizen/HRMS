@@ -105,7 +105,6 @@ const PerformanceGoals = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="page-title">{isEmployee ? 'My Goals' : 'Goal Management'}</h1>
           <p className="text-gray-500 text-sm">{goals.length} goals</p>
         </div>
         {!isEmployee && (

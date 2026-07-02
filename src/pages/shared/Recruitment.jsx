@@ -258,7 +258,6 @@ const Recruitment = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="page-title">Recruitment & Onboarding</h1>
           <p className="text-gray-500 text-sm">
             {tab === 'postings' && `${postings.length} job postings`}
             {tab === 'applicants' && `${applicants.length} applicants`}

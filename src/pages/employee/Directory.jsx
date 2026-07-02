@@ -34,10 +34,7 @@ const Directory = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="page-title">Employee Directory</h1>
-        <p className="text-gray-500 text-sm">{employees.length} active employees</p>
-      </div>
+      <p className="text-gray-500 text-sm">{employees.length} active employees</p>
 
       {/* Filters */}
       <div className="card p-4 flex flex-wrap gap-3">

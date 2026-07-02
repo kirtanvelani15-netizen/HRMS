@@ -85,10 +85,7 @@ const LogHours = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="page-title">My Work Log</h1>
-          <p className="text-gray-500 text-sm">{pagination.total} total entries</p>
-        </div>
+        <p className="text-gray-500 text-sm">{pagination.total} total entries</p>
         {/* Manual entry button removed - now using timer-based system */}
       </div>
 

@@ -63,7 +63,6 @@ const Profile = () => {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h1 className="page-title">My Profile</h1>
         {editing ? (
           <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
             <button onClick={() => setEditing(false)} className="btn-secondary text-sm justify-center sm:flex-none">Cancel</button>

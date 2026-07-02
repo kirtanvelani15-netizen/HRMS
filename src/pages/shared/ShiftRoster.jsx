@@ -123,7 +123,6 @@ const ShiftRoster = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="page-title">Shift & Roster</h1>
           <p className="text-gray-500 text-sm">{tab === 'shifts' ? `${shifts.length} shift types` : `${assignments.length} assignments`}</p>
         </div>
         {!isEmployee && (
