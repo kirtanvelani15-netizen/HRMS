@@ -66,7 +66,8 @@ export const departmentAPI = {
   getById: (id) => api.get(`/departments/${id}`),
   create: (data) => api.post('/departments', data),
   update: (id, data) => api.put(`/departments/${id}`, data),
-  delete: (id) => api.delete(`/departments/${id}`)
+  delete: (id) => api.delete(`/departments/${id}`),
+  assignWeekoff: (assignments) => api.put('/departments/weekoff-assignment', { assignments })
 };
 
 // ─── Attendance ──────────────────────────────────────────────────────────────
@@ -217,10 +218,12 @@ export const holidayAPI = {
   delete: (id) => api.delete(`/holidays/${id}`)
 };
 
-// ─── Weekoff Settings ─────────────────────────────────────────────────────────
-export const weekoffAPI = {
-  get: () => api.get('/weekoff'),
-  update: (data) => api.put('/weekoff', data),
+// ─── Weekly Off Templates ─────────────────────────────────────────────────────
+export const weekoffTemplateAPI = {
+  getAll: () => api.get('/weekoff-templates'),
+  create: (data) => api.post('/weekoff-templates', data),
+  update: (id, data) => api.put(`/weekoff-templates/${id}`, data),
+  delete: (id) => api.delete(`/weekoff-templates/${id}`)
 };
 
 // ─── Performance Management ───────────────────────────────────────────────────
