@@ -329,13 +329,13 @@ const WorkLog = () => {
                 </select>
               </div>
               <div>
-                <label className="label">Product Name *</label>
+                <label className="label">Project Name *</label>
                 <select
                   value={form.productName}
                   onChange={e => setForm({ ...form, productName: e.target.value })}
                   className="input-field"
                 >
-                  <option value="">---Select Product---</option>
+                  <option value="">---Select Project---</option>
                   <option value="Web App">Web App</option>
                   <option value="Mobile App">Mobile App</option>
                   <option value="Desktop App">Desktop App</option>
@@ -343,13 +343,13 @@ const WorkLog = () => {
                 </select>
               </div>
               <div>
-                <label className="label">Work Type</label>
+                <label className="label">Task</label>
                 <select
                   value={form.workType}
                   onChange={e => setForm({ ...form, workType: e.target.value })}
                   className="input-field"
                 >
-                  <option value="">---Select Work---</option>
+                  <option value="">---Select Task---</option>
                   <option value="Development">Development</option>
                   <option value="Testing">Testing</option>
                   <option value="Design">Design</option>
