@@ -200,14 +200,6 @@ const Attendance = () => {
     finally { setImporting(false); }
   };
 
-  const summaryCards = summary ? [
-    { label: 'Present', value: summary.present, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-    { label: 'Absent', value: summary.absent, color: 'text-red-600', bg: 'bg-red-50' },
-    { label: 'Late', value: summary.late, color: 'text-amber-600', bg: 'bg-amber-50' },
-    { label: 'Half Day', value: summary.halfDay, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Work Hours', value: `${summary.totalWorkHours}h`, color: 'text-purple-600', bg: 'bg-purple-50' },
-  ] : [];
-
   // Employee calendar
   const calendarDate = new Date(`${calendarMonth}-01T00:00:00`);
   const calendarYear = calendarDate.getFullYear();
@@ -291,34 +283,22 @@ const Attendance = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="page-title">Attendance</h1>
         {!isEmployee && (
-          <div className="grid grid-cols-1 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
             <button onClick={() => { setImportForm({ file: null, dateMode: 'sheet', date: new Date().toISOString().slice(0, 10) }); setImportResult(null); setShowImportModal(true); }}
-              className="btn-secondary flex items-center gap-2 justify-center sm:flex-none">
-              <FiUpload className="w-4 h-4" /> Import Excel
+              className="btn-secondary flex items-center gap-1.5 justify-center text-sm px-2.5 flex-1 sm:flex-none basis-[calc(50%-4px)] sm:basis-auto">
+              <FiUpload className="w-4 h-4 shrink-0" /> <span className="truncate">Import Excel</span>
             </button>
             <button onClick={() => { setBulkForm({ date: filters.date, status: 'present', checkIn: '', checkOut: '' }); setBulkSelectedIds([]); setBulkResult(null); setShowBulkModal(true); }}
-              className="btn-secondary flex items-center gap-2 text-purple-700 border-purple-200 hover:bg-purple-50 justify-center sm:flex-none">
-              <FiLayers className="w-4 h-4" /> Bulk Mark
+              className="btn-secondary flex items-center gap-1.5 text-purple-700 border-purple-200 hover:bg-purple-50 justify-center text-sm px-2.5 flex-1 sm:flex-none basis-[calc(50%-4px)] sm:basis-auto">
+              <FiLayers className="w-4 h-4 shrink-0" /> <span className="truncate">Bulk Mark</span>
             </button>
             <button onClick={() => { setEditRecord(null); setForm({ employee: '', date: new Date().toISOString().slice(0, 10), status: 'present', checkIn: '', checkOut: '', notes: '' }); setShowModal(true); }}
-              className="btn-primary flex items-center gap-2 justify-center sm:flex-none">
-              <FiPlus className="w-4 h-4" /> Mark Attendance
+              className="btn-primary flex items-center gap-1.5 justify-center text-sm px-2.5 w-full sm:w-auto sm:flex-none">
+              <FiPlus className="w-4 h-4 shrink-0" /> <span className="truncate">Mark Attendance</span>
             </button>
           </div>
         )}
       </div>
-
-      {/* Summary cards */}
-      {summary && (
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-          {summaryCards.map(({ label, value, color, bg }) => (
-            <div key={label} className={`card p-4 ${bg}`}>
-              <p className={`text-2xl font-bold ${color}`}>{value}</p>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{label}</p>
-            </div>
-          ))}
-        </div>
-      )}
 
       {isEmployee ? (
         /* Employee: calendar view */
