@@ -60,9 +60,23 @@ const WelcomePopup = () => {
   );
 };
 
+const useIsDesktop = () => {
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(min-width: 1024px)').matches : true
+  );
+  useEffect(() => {
+    const mql = window.matchMedia('(min-width: 1024px)');
+    const handler = (e) => setIsDesktop(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+  return isDesktop;
+};
+
 const DashboardLayout = () => {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const isDesktop = useIsDesktop();
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-gray-950 dark:via-gray-900 dark:to-indigo-950/20 overflow-hidden">
@@ -74,9 +88,9 @@ const DashboardLayout = () => {
 
       {/* Main content — animates left margin to match sidebar width */}
       <motion.div
-        animate={{ marginLeft: sidebarExpanded ? 248 : 64 }}
+        animate={{ marginLeft: isDesktop ? (sidebarExpanded ? 248 : 64) : 0 }}
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-        className="flex-1 flex flex-col overflow-hidden lg:ml-0 ml-0"
+        className="flex-1 flex flex-col overflow-hidden"
       >
         <Navbar onMenuClick={() => setMobileSidebarOpen(o => !o)} />
 
