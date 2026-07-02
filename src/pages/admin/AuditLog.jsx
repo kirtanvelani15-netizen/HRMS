@@ -69,7 +69,7 @@ const AuditLog = () => {
       transition={{ duration: 0.35 }} className="space-y-6">
 
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="page-title flex items-center gap-2">
             <FiActivity className="text-indigo-600 w-6 h-6" /> Audit Log
@@ -77,7 +77,7 @@ const AuditLog = () => {
           <p className="text-gray-500 text-sm mt-1">Track all system actions performed by admins and HR staff</p>
         </div>
         <button onClick={fetchLogs}
-          className="btn-secondary flex items-center gap-2 text-sm">
+          className="btn-secondary flex items-center justify-center gap-2 text-sm flex-1 sm:flex-none w-full sm:w-auto">
           <FiRefreshCw className="w-4 h-4" /> Refresh
         </button>
       </div>

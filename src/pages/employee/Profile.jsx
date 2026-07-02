@@ -62,19 +62,21 @@ const Profile = () => {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="page-title">My Profile</h1>
         {editing ? (
-          <div className="flex gap-2">
-            <button onClick={() => setEditing(false)} className="btn-secondary text-sm">Cancel</button>
-            <button onClick={handleSave} disabled={saving} className="btn-primary text-sm flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+            <button onClick={() => setEditing(false)} className="btn-secondary text-sm flex-1 sm:flex-none justify-center">Cancel</button>
+            <button onClick={handleSave} disabled={saving} className="btn-primary text-sm flex items-center gap-2 flex-1 sm:flex-none justify-center">
               <FiSave className="w-4 h-4" /> {saving ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         ) : (
-          <button onClick={() => setEditing(true)} className="btn-secondary text-sm flex items-center gap-2">
-            <FiEdit2 className="w-4 h-4" /> Edit Profile
-          </button>
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+            <button onClick={() => setEditing(true)} className="btn-secondary text-sm flex items-center gap-2 flex-1 sm:flex-none justify-center">
+              <FiEdit2 className="w-4 h-4" /> Edit Profile
+            </button>
+          </div>
         )}
       </div>
 

@@ -94,12 +94,12 @@ const PerformanceCycles = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="page-title">Performance Cycles</h1>
           <p className="text-gray-500 text-sm">{cycles.length} cycles</p>
         </div>
-        <button onClick={openAdd} className="btn-primary flex items-center gap-2">
+        <button onClick={openAdd} className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-none w-full sm:w-auto">
           <FiPlus className="w-4 h-4" /> New Cycle
         </button>
       </div>

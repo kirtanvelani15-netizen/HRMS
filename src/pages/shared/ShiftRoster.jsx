@@ -121,15 +121,15 @@ const ShiftRoster = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="page-title">Shift & Roster</h1>
           <p className="text-gray-500 text-sm">{tab === 'shifts' ? `${shifts.length} shift types` : `${assignments.length} assignments`}</p>
         </div>
         {!isEmployee && (
-          <div className="flex gap-2">
-            <button onClick={() => { setEditShift(null); setShiftForm({ name: '', startTime: '', endTime: '', description: '' }); setShowShiftModal(true); }} className="btn-secondary flex items-center gap-2"><FiPlus className="w-4 h-4" /> New Shift</button>
-            <button onClick={() => { setAssignForm({ employee: '', shift: '', date: today, notes: '' }); setShowAssignModal(true); }} className="btn-primary flex items-center gap-2"><FiPlus className="w-4 h-4" /> Assign Shift</button>
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+            <button onClick={() => { setEditShift(null); setShiftForm({ name: '', startTime: '', endTime: '', description: '' }); setShowShiftModal(true); }} className="btn-secondary flex items-center justify-center gap-2 flex-1 sm:flex-none"><FiPlus className="w-4 h-4" /> New Shift</button>
+            <button onClick={() => { setAssignForm({ employee: '', shift: '', date: today, notes: '' }); setShowAssignModal(true); }} className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-none"><FiPlus className="w-4 h-4" /> Assign Shift</button>
           </div>
         )}
       </div>

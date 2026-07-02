@@ -116,12 +116,12 @@ const ManageHR = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="page-title">Manage HR</h1>
           <p className="text-gray-500 text-sm">Manage HR staff accounts and permissions</p>
         </div>
-        <button onClick={() => { setShowAddModal(true); setSelectedEmployee(''); setEmpSearch(''); }} className="btn-primary flex items-center gap-2">
+        <button onClick={() => { setShowAddModal(true); setSelectedEmployee(''); setEmpSearch(''); }} className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-none w-full sm:w-auto">
           <FiPlus className="w-4 h-4" /> Add HR Staff
         </button>
       </div>

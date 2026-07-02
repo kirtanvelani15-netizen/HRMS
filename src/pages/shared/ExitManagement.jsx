@@ -86,13 +86,15 @@ const ExitManagement = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="page-title">Exit Management</h1>
           <p className="text-gray-500 text-sm">{requests.length} requests</p>
         </div>
         {isEmployee && !requests.some(r => ['pending', 'approved'].includes(r.status)) && (
-          <button onClick={() => { setForm({ resignationDate: today, lastWorkingDay: '', reason: '' }); setShowModal(true); }} className="btn-danger flex items-center gap-2"><FiPlus className="w-4 h-4" /> Submit Resignation</button>
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+            <button onClick={() => { setForm({ resignationDate: today, lastWorkingDay: '', reason: '' }); setShowModal(true); }} className="btn-danger flex items-center gap-2"><FiPlus className="w-4 h-4" /> Submit Resignation</button>
+          </div>
         )}
       </div>
 

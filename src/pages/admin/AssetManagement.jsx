@@ -130,9 +130,9 @@ const AssetManagement = () => {
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="page-title flex items-center gap-2"><FiMonitor /> Asset Management</h1>
-        <button onClick={() => setIsAddModalOpen(true)} className="btn-primary flex items-center gap-2">
+        <button onClick={() => setIsAddModalOpen(true)} className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-none w-full sm:w-auto">
           <FiPlus /> Add Asset
         </button>
       </div>

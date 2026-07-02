@@ -303,25 +303,25 @@ const Employees = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="page-title">Employees</h1>
           <p className="text-gray-500 text-sm">{pagination.total} {pagination.total === 1 ? 'Employee' : 'Employees'}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
           {activeTab === 'manage' && (
             <>
-              <button onClick={handleExport} disabled={exporting} className="btn-secondary flex items-center gap-2">
+              <button onClick={handleExport} disabled={exporting} className="btn-secondary flex items-center gap-2 flex-1 sm:flex-none justify-center">
                 {exporting ? <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" /> : <FiDownload className="w-4 h-4" />}
                 Export
               </button>
-              <button onClick={openAdd} className="btn-primary flex items-center gap-2">
+              <button onClick={openAdd} className="btn-primary flex items-center gap-2 flex-1 sm:flex-none justify-center">
                 <FiPlus className="w-4 h-4" /> Add Employee
               </button>
             </>
           )}
           {activeTab === 'projects' && (
-            <button onClick={openAddProject} className="btn-primary flex items-center gap-2">
+            <button onClick={openAddProject} className="btn-primary flex items-center gap-2 flex-1 sm:flex-none justify-center">
               <FiPlus className="w-4 h-4" /> New Project
             </button>
           )}

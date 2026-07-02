@@ -256,7 +256,7 @@ const Recruitment = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="page-title">Recruitment & Onboarding</h1>
           <p className="text-gray-500 text-sm">
@@ -266,15 +266,15 @@ const Recruitment = () => {
             {tab === 'ai-screening' && 'AI-powered resume screening'}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
           {tab === 'postings' && !isEmployee && (
-            <button onClick={() => { setEditPosting(null); setPostingForm(emptyPosting); setShowPostingModal(true); }} className="btn-primary flex items-center gap-2"><FiPlus className="w-4 h-4" /> Post Job</button>
+            <button onClick={() => { setEditPosting(null); setPostingForm(emptyPosting); setShowPostingModal(true); }} className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-none"><FiPlus className="w-4 h-4" /> Post Job</button>
           )}
           {tab === 'applicants' && !isEmployee && (
-            <button onClick={() => { setEditApplicant(null); setApplicantForm(emptyApplicant); setShowApplicantModal(true); }} className="btn-primary flex items-center gap-2"><FiUsers className="w-4 h-4" /> Add Applicant</button>
+            <button onClick={() => { setEditApplicant(null); setApplicantForm(emptyApplicant); setShowApplicantModal(true); }} className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-none"><FiUsers className="w-4 h-4" /> Add Applicant</button>
           )}
           {tab === 'onboarding' && !isEmployee && (
-            <button onClick={() => { setTaskForm(emptyTask); setShowTaskModal(true); }} className="btn-primary flex items-center gap-2"><FiPlus className="w-4 h-4" /> Add Task</button>
+            <button onClick={() => { setTaskForm(emptyTask); setShowTaskModal(true); }} className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-none"><FiPlus className="w-4 h-4" /> Add Task</button>
           )}
         </div>
       </div>

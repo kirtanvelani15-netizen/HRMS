@@ -131,14 +131,16 @@ const Documents = () => {
   if (isEmployee) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1 className="page-title">My Documents</h1>
             <p className="text-gray-500 text-sm">{documents.length} documents</p>
           </div>
-          <button onClick={openUploadModal} className="btn-primary flex items-center gap-2">
-            <FiUpload className="w-4 h-4" /> Upload Document
-          </button>
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+            <button onClick={openUploadModal} className="btn-primary flex items-center gap-2 flex-1 sm:flex-none justify-center">
+              <FiUpload className="w-4 h-4" /> Upload Document
+            </button>
+          </div>
         </div>
         {loading ? <LoadingSpinner /> : documents.length === 0 ? (
           <div className="card p-12 text-center">
@@ -177,9 +179,11 @@ const Documents = () => {
               <p className="text-gray-500 text-sm">{documents.length} documents</p>
             </div>
           </div>
-          <button onClick={openUploadModal} className="btn-primary flex items-center gap-2">
-            <FiUpload className="w-4 h-4" /> Upload Document
-          </button>
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+            <button onClick={openUploadModal} className="btn-primary flex items-center gap-2 flex-1 sm:flex-none justify-center">
+              <FiUpload className="w-4 h-4" /> Upload Document
+            </button>
+          </div>
         </div>
 
         <div className="card p-4">
@@ -210,14 +214,16 @@ const Documents = () => {
   // ── Admin / HR — folder list view ────────────────────────────────────────────
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="page-title">Documents</h1>
           <p className="text-gray-500 text-sm">{employees.length} employees</p>
         </div>
-        <button onClick={openUploadModal} className="btn-primary flex items-center gap-2">
-          <FiUpload className="w-4 h-4" /> Upload Document
-        </button>
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+          <button onClick={openUploadModal} className="btn-primary flex items-center gap-2 flex-1 sm:flex-none justify-center">
+            <FiUpload className="w-4 h-4" /> Upload Document
+          </button>
+        </div>
       </div>
 
       {loading ? <LoadingSpinner /> : employees.length === 0 ? (

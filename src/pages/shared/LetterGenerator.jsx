@@ -186,15 +186,15 @@ const LetterGenerator = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="page-title">Letter Generator</h1>
           <p className="text-gray-500 text-sm">{tab === 'templates' ? `${templates.length} templates` : `${requests.length} requests`}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
           {!isEmployee && tab === 'templates' && (
             <>
-              <button onClick={() => { setEditTemplate(null); setTemplateForm({ name: '', type: 'experience', body: '' }); setShowTemplateModal(true); }} className="btn-secondary flex items-center gap-2"><FiPlus className="w-4 h-4" /> New Template</button>
+              <button onClick={() => { setEditTemplate(null); setTemplateForm({ name: '', type: 'experience', body: '' }); setShowTemplateModal(true); }} className="btn-secondary flex items-center justify-center gap-2 flex-1 sm:flex-none"><FiPlus className="w-4 h-4" /> New Template</button>
               {user?.role === 'admin' && (
                 <>
                   <button onClick={handleLhToggle} title={lhEnabled ? 'Letterhead enabled — click to disable' : 'Click to upload letterhead PDF'}
@@ -207,7 +207,7 @@ const LetterGenerator = () => {
               )}
             </>
           )}
-          {isEmployee && <button onClick={() => { setRequestForm({ template: '', remarks: '' }); setShowRequestModal(true); }} className="btn-primary flex items-center gap-2"><FiFileText className="w-4 h-4" /> Request Letter</button>}
+          {isEmployee && <button onClick={() => { setRequestForm({ template: '', remarks: '' }); setShowRequestModal(true); }} className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-none"><FiFileText className="w-4 h-4" /> Request Letter</button>}
         </div>
       </div>
 

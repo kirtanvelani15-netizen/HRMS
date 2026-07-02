@@ -118,15 +118,17 @@ const PerformanceReviews = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="page-title">{isEmployee ? 'My Reviews' : 'Performance Reviews'}</h1>
           <p className="text-gray-500 text-sm">{reviews.length} reviews</p>
         </div>
         {!isEmployee && (
-          <button onClick={() => { setCreateForm({ employee: '', cycle: '' }); setShowCreateModal(true); }} className="btn-primary flex items-center gap-2">
-            <FiPlus className="w-4 h-4" /> Create Review
-          </button>
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+            <button onClick={() => { setCreateForm({ employee: '', cycle: '' }); setShowCreateModal(true); }} className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-none">
+              <FiPlus className="w-4 h-4" /> Create Review
+            </button>
+          </div>
         )}
       </div>
 

@@ -57,15 +57,17 @@ const Departments = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="page-title">Departments</h1>
           <p className="text-gray-500 text-sm">{departments.length} {departments.length === 1 ? 'Department' : 'Departments'}</p>
         </div>
         {user.role === 'admin' && (
-          <button onClick={openAdd} className="btn-primary flex items-center gap-2">
-            <FiPlus className="w-4 h-4" /> Add Department
-          </button>
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+            <button onClick={openAdd} className="btn-primary flex items-center gap-2 flex-1 sm:flex-none justify-center">
+              <FiPlus className="w-4 h-4" /> Add Department
+            </button>
+          </div>
         )}
       </div>
 

@@ -70,16 +70,18 @@ const Notices = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="page-title">Notices & Announcements</h1>
           <p className="text-gray-500 text-sm">{pagination.total} notices</p>
         </div>
         {user.role !== 'employee' && (
-          <button onClick={() => { setEditNotice(null); setForm({ title: '', content: '', category: 'general', priority: 'medium', targetAudience: 'all', isPublished: true, scheduledAt: '' }); setShowModal(true); }}
-            className="btn-primary flex items-center gap-2">
-            <FiPlus className="w-4 h-4" /> Post Notice
-          </button>
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+            <button onClick={() => { setEditNotice(null); setForm({ title: '', content: '', category: 'general', priority: 'medium', targetAudience: 'all', isPublished: true, scheduledAt: '' }); setShowModal(true); }}
+              className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-none">
+              <FiPlus className="w-4 h-4" /> Post Notice
+            </button>
+          </div>
         )}
       </div>
 

@@ -124,12 +124,12 @@ const Holidays = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="page-title">Holiday Calendar</h1>
           <p className="text-gray-500 text-sm">{holidays.length} holidays in {year}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
           <select
             value={year}
             onChange={e => setYear(Number(e.target.value))}
@@ -138,7 +138,7 @@ const Holidays = () => {
             {[year - 1, year, year + 1].map(y => <option key={y} value={y}>{y}</option>)}
           </select>
           {canManage && (
-            <button onClick={openAdd} className="btn-primary flex items-center gap-2">
+            <button onClick={openAdd} className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-none">
               <FiPlus className="w-4 h-4" /> Add Holiday
             </button>
           )}

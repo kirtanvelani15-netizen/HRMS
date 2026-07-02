@@ -91,12 +91,12 @@ const Reports = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="page-title">Reports & Analytics</h1>
           <p className="text-gray-500 text-sm">Generate and export detailed reports</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto">
           <select value={filters.month} onChange={e => setFilters(f => ({ ...f, month: Number(e.target.value) }))} className="input-field w-36">
             {months.map(m => <option key={m.val} value={m.val}>{m.label}</option>)}
           </select>
