@@ -42,7 +42,7 @@ const adminMenu = [
     label: 'Time & Attendance', icon: FiCalendar, group: true, module: 'attendance',
     children: [
       { label: 'Attendance', to: '/admin/attendance' },
-      { label: 'Leave Mgmt', to: '/admin/leaves' },
+      { label: 'Leave Management', to: '/admin/leaves' },
       { label: 'Shifts',     to: '/admin/shifts' },
       { label: 'Holidays',   to: '/admin/holidays' },
     ]
@@ -88,7 +88,7 @@ const adminMenu = [
     children: [
       { label: 'Recruitment', to: '/admin/recruitment', module: 'recruitment' },
       { label: 'Training',    to: '/admin/training',    module: 'training' },
-      { label: 'Exit Mgmt',   to: '/admin/exit',        module: 'exit' },
+      { label: 'Exit Management',   to: '/admin/exit',        module: 'exit' },
       { label: 'Grievances',  to: '/admin/grievances',  module: 'grievances' },
     ]
   },
@@ -114,7 +114,7 @@ const hrMenu = [
     label: 'Time & Attendance', icon: FiCalendar, group: true, module: 'attendance',
     children: [
       { label: 'Attendance', to: '/hr/attendance' },
-      { label: 'Leave Mgmt', to: '/hr/leaves' },
+      { label: 'Leave Management', to: '/hr/leaves' },
       { label: 'Shifts',     to: '/hr/shifts' },
       { label: 'Holidays',   to: '/hr/holidays' },
     ]
@@ -159,7 +159,7 @@ const hrMenu = [
     children: [
       { label: 'Recruitment', to: '/hr/recruitment', module: 'recruitment' },
       { label: 'Training',    to: '/hr/training',    module: 'training' },
-      { label: 'Exit Mgmt',   to: '/hr/exit',        module: 'exit' },
+      { label: 'Exit Management',   to: '/hr/exit',        module: 'exit' },
       { label: 'Grievances',  to: '/hr/grievances',  module: 'grievances' },
     ]
   },
