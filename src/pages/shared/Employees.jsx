@@ -184,6 +184,7 @@ const Employees = () => {
         reportingManager: form.isTeamLeader ? null : (form.reportingManager || null),
         reportingManagerUser: form.isTeamLeader ? (form.reportingManagerUser || null) : null
       };
+      console.log('[DEBUG] handleSave payload - pfApplicable:', payload.pfApplicable, 'uanNumber:', payload.uanNumber, 'tdsApplicable:', payload.tdsApplicable);
       if (editEmployee) {
         const res = await employeeAPI.update(editEmployee._id, payload);
         if (res.data.success) {
