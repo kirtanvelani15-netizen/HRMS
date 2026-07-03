@@ -33,6 +33,7 @@ const EmployeeFormField = ({ field, label, type = 'text', options, required, val
 );
 
 const Employees = () => {
+  console.log('[DEBUG] Employees component loaded - PF/UAN fix is active');
   const { user } = useAuth();
   const [employees, setEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);
