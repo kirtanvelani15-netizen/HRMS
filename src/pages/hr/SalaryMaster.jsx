@@ -3,6 +3,8 @@ import { FiSave, FiRefreshCw, FiInfo, FiPlus, FiTrash2, FiLock, FiClock, FiDolla
 import toast from 'react-hot-toast';
 import { payrollAPI } from '../../services/api';
 
+console.log('[SalaryMaster] File loaded');
+
 const SESSION_KEY = 'salaryMasterUnlocked';
 
 // ─── Password Gate ────────────────────────────────────────────────────────────
