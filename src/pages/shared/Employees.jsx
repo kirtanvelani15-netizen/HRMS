@@ -156,7 +156,10 @@ const Employees = () => {
       skills: emp.skills?.join(', ') || '',
       isTeamLeader: emp.isTeamLeader || false,
       reportingManager: emp.reportingManager?._id || emp.reportingManager || '',
-      reportingManagerUser: emp.reportingManagerUser?._id || emp.reportingManagerUser || ''
+      reportingManagerUser: emp.reportingManagerUser?._id || emp.reportingManagerUser || '',
+      pfApplicable: emp.pfApplicable ?? true,
+      uanNumber: emp.uanNumber || '',
+      tdsApplicable: emp.tdsApplicable || false
     });
     setShowModal(true);
   };
