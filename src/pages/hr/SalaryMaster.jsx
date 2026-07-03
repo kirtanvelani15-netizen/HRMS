@@ -258,7 +258,17 @@ const computeDeductionsPreview = (deductions, basicSalary, grossTotal) => {
   const monthly = grossTotal;
   const results = deductions.map(d => {
     let val = 0;
-    if (d.calculationType === 'fixed') {
+
+    // Special handling for PF: conditional based on gross salary
+    if (d.key === 'pf' || d.name?.toLowerCase().includes('pf') || d.name?.toLowerCase().includes('provident')) {
+      if (grossTotal <= 30000) {
+        // Gross <= 30,000: Calculate 12% of Basic
+        val = Math.round(basicSalary * 0.12);
+      } else {
+        // Gross > 30,000: Fixed amount of 1800
+        val = 1800;
+      }
+    } else if (d.calculationType === 'fixed') {
       val = Number(d.value) || 0;
     } else if (d.calculationType === 'percentage_ctc') {
       val = Math.round(monthly * (Number(d.value) || 0) / 100);
@@ -267,6 +277,7 @@ const computeDeductionsPreview = (deductions, basicSalary, grossTotal) => {
     } else if (d.calculationType === 'percentage_gross') {
       val = Math.round(grossTotal * (Number(d.value) || 0) / 100);
     }
+
     return { ...d, computed: val };
   });
   const totalDeductions = results.reduce((s, d) => s + (d.computed || 0), 0);
