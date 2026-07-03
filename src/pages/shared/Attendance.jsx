@@ -50,7 +50,8 @@ const Attendance = () => {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [editRecord, setEditRecord] = useState(null);
-  const [form, setForm] = useState({ employee: '', date: new Date().toISOString().slice(0, 10), status: 'present', checkIn: '', checkOut: '', notes: '' });
+  const [dateMode, setDateMode] = useState('single'); // 'single' or 'range'
+  const [form, setForm] = useState({ employee: '', date: new Date().toISOString().slice(0, 10), fromDate: new Date().toISOString().slice(0, 10), toDate: new Date().toISOString().slice(0, 10), status: 'present', checkIn: '', checkOut: '', notes: '' });
   const [importForm, setImportForm] = useState({ file: null, dateMode: 'sheet', date: new Date().toISOString().slice(0, 10) });
   const [importResult, setImportResult] = useState(null);
   const [bulkForm, setBulkForm] = useState({ date: new Date().toISOString().slice(0, 10), status: 'present', checkIn: '', checkOut: '' });
@@ -132,19 +133,48 @@ const Attendance = () => {
 
   const handleSave = async () => {
     if (!form.employee && !isEmployee) return toast.error('Select an employee');
+    if (dateMode === 'range' && (!form.fromDate || !form.toDate)) return toast.error('Select both from and to dates');
+    if (dateMode === 'range' && form.fromDate > form.toDate) return toast.error('From date must be before to date');
+
     setSaving(true);
     try {
-      const payload = {
-        ...form,
-        checkIn: form.checkIn ? `${form.date}T${form.checkIn}` : '',
-        checkOut: form.checkOut ? `${form.date}T${form.checkOut}` : ''
-      };
-      if (editRecord) {
-        await attendanceAPI.update(editRecord._id, payload);
-        toast.success('Attendance updated');
+      if (dateMode === 'range' && !editRecord) {
+        // Mark attendance for date range
+        const startDate = new Date(form.fromDate);
+        const endDate = new Date(form.toDate);
+        const dates = [];
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+          dates.push(d.toISOString().slice(0, 10));
+        }
+
+        const records = dates.map(date => ({
+          employee: form.employee,
+          date,
+          status: form.status,
+          checkIn: form.checkIn ? `${date}T${form.checkIn}` : '',
+          checkOut: form.checkOut ? `${date}T${form.checkOut}` : '',
+          notes: form.notes
+        }));
+
+        const res = await attendanceAPI.bulkMark({ records });
+        if (res.data.success) {
+          const ok = res.data.data.filter(r => r.success).length;
+          const fail = res.data.data.filter(r => !r.success).length;
+          toast.success(`${ok} records marked${fail ? `, ${fail} failed` : ''}`);
+        }
       } else {
-        await attendanceAPI.mark(payload);
-        toast.success('Attendance marked');
+        const payload = {
+          ...form,
+          checkIn: form.checkIn ? `${form.date}T${form.checkIn}` : '',
+          checkOut: form.checkOut ? `${form.date}T${form.checkOut}` : ''
+        };
+        if (editRecord) {
+          await attendanceAPI.update(editRecord._id, payload);
+          toast.success('Attendance updated');
+        } else {
+          await attendanceAPI.mark(payload);
+          toast.success('Attendance marked');
+        }
       }
       fetchRecords(); setShowModal(false);
     } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
@@ -291,7 +321,7 @@ const Attendance = () => {
               className="btn-secondary flex items-center gap-1.5 text-purple-700 border-purple-200 hover:bg-purple-50 justify-center text-sm px-2.5 flex-1 sm:flex-none basis-[calc(50%-4px)] sm:basis-auto">
               <FiLayers className="w-4 h-4 shrink-0" /> <span className="truncate">Bulk Mark</span>
             </button>
-            <button onClick={() => { setEditRecord(null); setForm({ employee: '', date: new Date().toISOString().slice(0, 10), status: 'present', checkIn: '', checkOut: '', notes: '' }); setShowModal(true); }}
+            <button onClick={() => { setEditRecord(null); setDateMode('single'); setForm({ employee: '', date: new Date().toISOString().slice(0, 10), fromDate: new Date().toISOString().slice(0, 10), toDate: new Date().toISOString().slice(0, 10), status: 'present', checkIn: '', checkOut: '', notes: '' }); setShowModal(true); }}
               className="btn-primary flex items-center gap-1.5 justify-center text-sm px-2.5 w-full sm:w-auto sm:flex-none">
               <FiPlus className="w-4 h-4 shrink-0" /> <span className="truncate">Mark Attendance</span>
             </button>
@@ -496,7 +526,7 @@ const Attendance = () => {
       )}
 
       {/* Single Mark Modal */}
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title={editRecord ? 'Edit Attendance' : 'Mark Attendance'} size="sm"
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title={editRecord ? 'Edit Attendance Record' : 'Mark Attendance'} size="lg"
         footer={
           <>
             <button onClick={() => setShowModal(false)} className="btn-secondary">Cancel</button>
@@ -504,41 +534,109 @@ const Attendance = () => {
           </>
         }
       >
-        <div className="space-y-4">
+        <div className="space-y-5">
           {!isEmployee && !editRecord && (
             <div>
-              <label className="label">Employee *</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Employee Selection *</label>
               <select value={form.employee} onChange={e => setForm(f => ({ ...f, employee: e.target.value }))} className="input-field">
-                <option value="">Select Employee</option>
+                <option value="">Select an employee</option>
                 {employees.map(e => <option key={e._id} value={e._id}>{e.firstName} {e.lastName}</option>)}
               </select>
             </div>
           )}
+
+          {!editRecord && (
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-3">Date Selection</label>
+              <div className="flex gap-2 mb-4">
+                {[['single', 'Single Day'], ['range', 'Date Range']].map(([mode, label]) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setDateMode(mode)}
+                    className={`flex-1 px-3 py-2.5 rounded-lg border text-sm font-medium transition-all ${
+                      dateMode === mode
+                        ? 'bg-primary-600 text-white border-primary-600 shadow-sm'
+                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-primary-400'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {dateMode === 'single' ? (
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Date *</label>
+                  <input
+                    type="date"
+                    value={form.date}
+                    onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
+                    className="input-field"
+                  />
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">From Date *</label>
+                    <input
+                      type="date"
+                      value={form.fromDate}
+                      onChange={e => setForm(f => ({ ...f, fromDate: e.target.value }))}
+                      className="input-field"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">To Date *</label>
+                    <input
+                      type="date"
+                      value={form.toDate}
+                      onChange={e => setForm(f => ({ ...f, toDate: e.target.value }))}
+                      className="input-field"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {editRecord && (
+            <div>
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Date</label>
+              <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} className="input-field" />
+            </div>
+          )}
+
           <div>
-            <label className="label">Date</label>
-            <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} className="input-field" />
-          </div>
-          <div>
-            <label className="label">Status</label>
+            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Attendance Status *</label>
             <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))} className="input-field">
+              <option value="">Select status</option>
               {STATUS_OPTS.map(s => <option key={s} value={s} className="capitalize">{s}</option>)}
             </select>
           </div>
+
           {!['absent', 'holiday', 'weekend'].includes(form.status) && (
-            <>
+            <div className="grid grid-cols-2 gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
               <div>
-                <label className="label">Check In</label>
-                <input type="time" value={form.checkIn} onChange={e => setForm(f => ({ ...f, checkIn: e.target.value }))} className="input-field" />
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Check In Time</label>
+                <input type="time" value={form.checkIn} onChange={e => setForm(f => ({ ...f, checkIn: e.target.value }))} className="input-field" placeholder="HH:MM" />
               </div>
               <div>
-                <label className="label">Check Out</label>
-                <input type="time" value={form.checkOut} onChange={e => setForm(f => ({ ...f, checkOut: e.target.value }))} className="input-field" />
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Check Out Time</label>
+                <input type="time" value={form.checkOut} onChange={e => setForm(f => ({ ...f, checkOut: e.target.value }))} className="input-field" placeholder="HH:MM" />
               </div>
-            </>
+            </div>
           )}
+
           <div>
-            <label className="label">Notes</label>
-            <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} className="input-field" rows={2} />
+            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">Notes (Optional)</label>
+            <textarea
+              value={form.notes}
+              onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
+              className="input-field"
+              rows={3}
+              placeholder="Add any relevant notes..."
+            />
           </div>
         </div>
       </Modal>
