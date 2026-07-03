@@ -220,9 +220,12 @@ const computePreview = (components, ctc) => {
       basicSalary = val;
       sumNonRemaining += val;
       results.push({ ...c, computed: val });
+      console.log('[SalaryMaster] Basic calculated:', { key: c.key, calculationType: c.calculationType, value: c.value, computed: val });
       break;
     }
   }
+
+  console.log('[SalaryMaster] After pass 1, basicSalary:', basicSalary, 'components:', components.length);
 
   // Second pass: calculate all other non-remaining components using basicSalary
   for (const c of components) {
@@ -234,6 +237,7 @@ const computePreview = (components, ctc) => {
       val = Math.round(monthly * (Number(c.value) || 0) / 100);
     } else if (c.calculationType === 'percentage_basic') {
       val = Math.round(basicSalary * (Number(c.value) || 0) / 100);
+      console.log('[SalaryMaster] % of Basic:', { key: c.key, name: c.name, value: c.value, basicSalary, computed: val });
     } else if (c.calculationType === 'percentage_gross') {
       val = Math.round(monthly * (Number(c.value) || 0) / 100);
     }
