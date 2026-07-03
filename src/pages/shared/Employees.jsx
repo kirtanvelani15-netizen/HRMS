@@ -605,7 +605,7 @@ const Employees = () => {
                 className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
               />
               <label htmlFor="pf-applicable" className="text-sm font-medium text-blue-900 dark:text-blue-300">
-                PF Applicable (12% of Basic if Gross ≤ ₹30,000 or ₹1,800 if Gross > ₹30,000)
+                PF Applicable (Fixed ₹1,800 if Basic ≥ ₹15,000 or 12% of Basic if Basic &lt; ₹15,000)
               </label>
             </div>
             {form.pfApplicable && (

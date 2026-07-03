@@ -259,14 +259,14 @@ const computeDeductionsPreview = (deductions, basicSalary, grossTotal) => {
   const results = deductions.map(d => {
     let val = 0;
 
-    // Special handling for PF: conditional based on gross salary
+    // Special handling for PF: conditional based on basic salary
     if (d.key === 'pf' || d.name?.toLowerCase().includes('pf') || d.name?.toLowerCase().includes('provident')) {
-      if (grossTotal <= 30000) {
-        // Gross <= 30,000: Calculate 12% of Basic
-        val = Math.round(basicSalary * 0.12);
-      } else {
-        // Gross > 30,000: Fixed amount of 1800
+      if (basicSalary >= 15000) {
+        // Basic >= 15,000: Fixed amount of 1800
         val = 1800;
+      } else {
+        // Basic < 15,000: Calculate 12% of Basic
+        val = Math.round(basicSalary * 0.12);
       }
     } else if (d.calculationType === 'fixed') {
       val = Number(d.value) || 0;
