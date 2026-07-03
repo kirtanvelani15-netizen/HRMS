@@ -208,9 +208,25 @@ const computePreview = (components, ctc) => {
   let sumNonRemaining = 0;
   const results = [];
 
-  // First pass: basic + non-remaining
+  // First pass: calculate ONLY basic_salary
   for (const c of components) {
-    if (c.calculationType === 'remaining') continue;
+    if (c.key === 'basic_salary' && c.calculationType !== 'remaining') {
+      let val = 0;
+      if (c.calculationType === 'fixed') {
+        val = Number(c.value) || 0;
+      } else if (c.calculationType === 'percentage_ctc') {
+        val = Math.round(monthly * (Number(c.value) || 0) / 100);
+      }
+      basicSalary = val;
+      sumNonRemaining += val;
+      results.push({ ...c, computed: val });
+      break;
+    }
+  }
+
+  // Second pass: calculate all other non-remaining components using basicSalary
+  for (const c of components) {
+    if (c.calculationType === 'remaining' || c.key === 'basic_salary') continue;
     let val = 0;
     if (c.calculationType === 'fixed') {
       val = Number(c.value) || 0;
@@ -221,12 +237,11 @@ const computePreview = (components, ctc) => {
     } else if (c.calculationType === 'percentage_gross') {
       val = Math.round(monthly * (Number(c.value) || 0) / 100);
     }
-    if (c.key === 'basic_salary') basicSalary = val;
     sumNonRemaining += val;
     results.push({ ...c, computed: val });
   }
 
-  // Second pass: remaining
+  // Third pass: handle remaining
   const remainingVal = Math.max(0, monthly - sumNonRemaining);
   const final = components.map(c => {
     if (c.calculationType !== 'remaining') {
