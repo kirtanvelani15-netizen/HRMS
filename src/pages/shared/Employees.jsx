@@ -12,7 +12,10 @@ const EMPTY_FORM = {
   joiningDate: '', salary: '', gender: '', dateOfBirth: '', employmentType: 'full-time',
   password: '', skills: '', status: 'active', isTeamLeader: false,
   reportingManager: '',      // used when NOT a team leader (points to another TL employee)
-  reportingManagerUser: ''   // used when IS a team leader (points to HR/Admin user)
+  reportingManagerUser: '',  // used when IS a team leader (points to HR/Admin user)
+  pfApplicable: true,        // PF deduction applicable
+  uanNumber: '',             // UAN for PF
+  tdsApplicable: false       // TDS deduction applicable
 };
 
 const EmployeeFormField = ({ field, label, type = 'text', options, required, value, onChange }) => (
@@ -161,6 +164,12 @@ const Employees = () => {
   const handleSave = async () => {
     if (!form.firstName || !form.lastName || !form.email || !form.department || !form.designation) {
       return toast.error('Please fill in all required fields');
+    }
+    if (form.pfApplicable && !form.uanNumber) {
+      return toast.error('UAN Number is required when PF is enabled');
+    }
+    if (form.uanNumber && form.uanNumber.length !== 12) {
+      return toast.error('UAN Number must be exactly 12 digits');
     }
     setSaving(true);
     try {
@@ -581,6 +590,56 @@ const Employees = () => {
               }}
             />
           </div>
+
+          {/* PF Configuration */}
+          <div className="sm:col-span-2">
+            <div className="flex items-center gap-3 p-3 rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-700">
+              <input
+                type="checkbox"
+                id="pf-applicable"
+                checked={form.pfApplicable || false}
+                onChange={(e) => {
+                  handleFormChange('pfApplicable', e.target.checked);
+                  if (!e.target.checked) handleFormChange('uanNumber', '');
+                }}
+                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+              />
+              <label htmlFor="pf-applicable" className="text-sm font-medium text-blue-900 dark:text-blue-300">
+                PF Applicable (12% of Basic if Gross ≤ ₹30,000 or ₹1,800 if Gross > ₹30,000)
+              </label>
+            </div>
+            {form.pfApplicable && (
+              <div className="mt-2">
+                <label className="label">UAN Number (required)</label>
+                <input
+                  type="text"
+                  className="input-field"
+                  placeholder="e.g., 100012345678"
+                  maxLength="12"
+                  value={form.uanNumber || ''}
+                  onChange={e => handleFormChange('uanNumber', e.target.value.toUpperCase())}
+                />
+                <p className="text-xs text-gray-400 mt-1">Universal Account Number (12 digits)</p>
+              </div>
+            )}
+          </div>
+
+          {/* TDS Configuration */}
+          <div className="sm:col-span-2">
+            <div className="flex items-center gap-3 p-3 rounded-lg border border-orange-200 bg-orange-50 dark:bg-orange-900/20 dark:border-orange-700">
+              <input
+                type="checkbox"
+                id="tds-applicable"
+                checked={form.tdsApplicable || false}
+                onChange={(e) => handleFormChange('tdsApplicable', e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500 cursor-pointer"
+              />
+              <label htmlFor="tds-applicable" className="text-sm font-medium text-orange-900 dark:text-orange-300">
+                TDS Applicable (calculated automatically based on annual income)
+              </label>
+            </div>
+          </div>
+
           <EmployeeFormField field="gender" label="Gender" value={form.gender} onChange={handleFormChange}
             options={[{ value: 'male', label: 'Male' }, { value: 'female', label: 'Female' }, { value: 'other', label: 'Other' }]} />
           <EmployeeFormField field="dateOfBirth" label="Date of Birth" type="date" value={form.dateOfBirth} onChange={handleFormChange} />
