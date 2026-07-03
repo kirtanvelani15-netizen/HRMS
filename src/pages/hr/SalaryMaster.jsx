@@ -254,21 +254,11 @@ const computePreview = (components, ctc) => {
   return { final, grossTotal, basicSalary };
 };
 
-const computeDeductionsPreview = (deductions, basicSalary, grossTotal, pfApplicable) => {
+const computeDeductionsPreview = (deductions, basicSalary, grossTotal) => {
   const monthly = grossTotal;
   const results = deductions.map(d => {
     let val = 0;
-
-    // Special handling for PF: conditional based on gross salary
-    if (d.key === 'pf' && pfApplicable) {
-      if (grossTotal <= 30000) {
-        // Gross <= 30,000: Calculate 12% of Basic
-        val = Math.round(basicSalary * 0.12);
-      } else {
-        // Gross > 30,000: Fixed amount of 1800
-        val = 1800;
-      }
-    } else if (d.calculationType === 'fixed') {
+    if (d.calculationType === 'fixed') {
       val = Number(d.value) || 0;
     } else if (d.calculationType === 'percentage_ctc') {
       val = Math.round(monthly * (Number(d.value) || 0) / 100);
@@ -277,7 +267,6 @@ const computeDeductionsPreview = (deductions, basicSalary, grossTotal, pfApplica
     } else if (d.calculationType === 'percentage_gross') {
       val = Math.round(grossTotal * (Number(d.value) || 0) / 100);
     }
-
     return { ...d, computed: val };
   });
   const totalDeductions = results.reduce((s, d) => s + (d.computed || 0), 0);
@@ -437,9 +426,6 @@ const SalaryMaster = () => {
   const [saving, setSaving] = useState(false);
   const [showAddComp, setShowAddComp] = useState(false);
   const [showAddDeduct, setShowAddDeduct] = useState(false);
-  const [pfApplicable, setPfApplicable] = useState(true);
-  const [uanNumber, setUanNumber] = useState('');
-  const [tdsApplicable, setTdsApplicable] = useState(false);
   const [setupStatus, setSetupStatus] = useState([]);
 
   // Check pin status on mount
@@ -467,9 +453,6 @@ const SalaryMaster = () => {
         setTemplateId(t._id);
         setBasicSalaryLocked(!!t.basicSalaryLocked);
         setOvertimeType(t.overtimeType || 'salary');
-        setPfApplicable(t.pfApplicable !== undefined ? t.pfApplicable : true);
-        setUanNumber(t.uanNumber || '');
-        setTdsApplicable(!!t.tdsApplicable);
         setComponents((t.components || []).map(apiToInternal));
         setDeductions((t.deductions || []).map(apiToInternal));
       }
@@ -510,7 +493,7 @@ const SalaryMaster = () => {
   }
 
   const { final: previewComps, grossTotal, basicSalary: previewBasic } = computePreview(components, previewCTC);
-  const { results: previewDeducts, totalDeductions } = computeDeductionsPreview(deductions, previewBasic, grossTotal, pfApplicable);
+  const { results: previewDeducts, totalDeductions } = computeDeductionsPreview(deductions, previewBasic, grossTotal);
 
   const updateComp = (idx, updated) => setComponents(prev => prev.map((c, i) => i === idx ? updated : c));
   const deleteComp = (idx) => setComponents(prev => prev.filter((_, i) => i !== idx));
@@ -521,16 +504,10 @@ const SalaryMaster = () => {
   const addDeduct = (d) => { setDeductions(prev => [...prev, d]); setShowAddDeduct(false); };
 
   const handleSave = async () => {
-    if (pfApplicable && !uanNumber) {
-      return toast.error('UAN Number is required when PF is enabled');
-    }
     setSaving(true);
     const payload = {
       name: 'Default Salary Master',
       overtimeType,
-      pfApplicable,
-      uanNumber,
-      tdsApplicable,
       components: components.map((c, i) => ({ ...internalToApi(c), order: i })),
       deductions: deductions.map((d, i) => ({ ...internalToApi(d), order: i })),
     };
@@ -677,88 +654,6 @@ const SalaryMaster = () => {
             </div>
           </div>
 
-          {/* PF CONFIGURATION */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-5 h-5 text-blue-600 dark:text-blue-400 font-bold">₹</span>
-              <h2 className="text-base font-semibold text-gray-900 dark:text-white">Provident Fund (PF)</h2>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  id="pf-applicable"
-                  checked={pfApplicable}
-                  onChange={(e) => {
-                    setPfApplicable(e.target.checked);
-                    if (!e.target.checked) setUanNumber('');
-                  }}
-                  className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
-                />
-                <label htmlFor="pf-applicable" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  PF Applicable for Employees
-                </label>
-              </div>
-              {pfApplicable && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    UAN Number (required when PF enabled)
-                  </label>
-                  <input
-                    type="text"
-                    value={uanNumber}
-                    onChange={(e) => setUanNumber(e.target.value.toUpperCase())}
-                    placeholder="e.g., 100012345678"
-                    maxLength="12"
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 outline-none"
-                  />
-                  <p className="text-xs text-gray-400 mt-1">Universal Account Number (12 digits)</p>
-                </div>
-              )}
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3">
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  <strong>Employee Deduction:</strong> 12% of basic salary (as per compliance settings)
-                </p>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                  <strong>Employer Contribution:</strong> 12% of basic salary
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* TDS CONFIGURATION */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-5 h-5 text-orange-600 dark:text-orange-400 font-bold">%</span>
-              <h2 className="text-base font-semibold text-gray-900 dark:text-white">Tax Deducted at Source (TDS)</h2>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  id="tds-applicable"
-                  checked={tdsApplicable}
-                  onChange={(e) => setTdsApplicable(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
-                />
-                <label htmlFor="tds-applicable" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  TDS Applicable for Employees
-                </label>
-              </div>
-              {tdsApplicable && (
-                <div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-                    TDS will be calculated as per income tax compliance settings (new regime)
-                  </p>
-                  <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg px-4 py-3">
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      TDS calculation is handled automatically during payroll generation based on annual income slabs.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
 
           {/* OVERTIME */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
