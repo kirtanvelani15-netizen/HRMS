@@ -240,10 +240,14 @@ const computePreview = (components, ctc) => {
       console.log('[SalaryMaster] % of Basic:', { key: c.key, name: c.name, value: c.value, basicSalary, computed: val });
     } else if (c.calculationType === 'percentage_gross') {
       val = Math.round(monthly * (Number(c.value) || 0) / 100);
+      console.log('[SalaryMaster] % of Gross:', { key: c.key, name: c.name, value: c.value, monthly, computed: val });
     }
+    console.log('[SalaryMaster] Component pass 2:', { key: c.key, name: c.name, type: c.calculationType, computed: val });
     sumNonRemaining += val;
     results.push({ ...c, computed: val });
   }
+
+  console.log('[SalaryMaster] Pass 2 complete, basicSalary:', basicSalary, 'results:', results);
 
   // Third pass: handle remaining
   const remainingVal = Math.max(0, monthly - sumNonRemaining);
