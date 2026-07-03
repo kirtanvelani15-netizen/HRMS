@@ -254,14 +254,30 @@ const computePreview = (components, ctc) => {
   return { final, grossTotal, basicSalary };
 };
 
-const computeDeductionsPreview = (deductions, basicSalary, grossTotal) => {
+const computeDeductionsPreview = (deductions, basicSalary, grossTotal, pfApplicable) => {
   const monthly = grossTotal;
   const results = deductions.map(d => {
     let val = 0;
-    if (d.calculationType === 'fixed') val = Number(d.value) || 0;
-    else if (d.calculationType === 'percentage_ctc') val = Math.round(monthly * (Number(d.value) || 0) / 100);
-    else if (d.calculationType === 'percentage_basic') val = Math.round(basicSalary * (Number(d.value) || 0) / 100);
-    else if (d.calculationType === 'percentage_gross') val = Math.round(grossTotal * (Number(d.value) || 0) / 100);
+
+    // Special handling for PF: conditional based on gross salary
+    if (d.key === 'pf' && pfApplicable) {
+      if (grossTotal <= 30000) {
+        // Gross <= 30,000: Calculate 12% of Basic
+        val = Math.round(basicSalary * 0.12);
+      } else {
+        // Gross > 30,000: Fixed amount of 1800
+        val = 1800;
+      }
+    } else if (d.calculationType === 'fixed') {
+      val = Number(d.value) || 0;
+    } else if (d.calculationType === 'percentage_ctc') {
+      val = Math.round(monthly * (Number(d.value) || 0) / 100);
+    } else if (d.calculationType === 'percentage_basic') {
+      val = Math.round(basicSalary * (Number(d.value) || 0) / 100);
+    } else if (d.calculationType === 'percentage_gross') {
+      val = Math.round(grossTotal * (Number(d.value) || 0) / 100);
+    }
+
     return { ...d, computed: val };
   });
   const totalDeductions = results.reduce((s, d) => s + (d.computed || 0), 0);
@@ -494,7 +510,7 @@ const SalaryMaster = () => {
   }
 
   const { final: previewComps, grossTotal, basicSalary: previewBasic } = computePreview(components, previewCTC);
-  const { results: previewDeducts, totalDeductions } = computeDeductionsPreview(deductions, previewBasic, grossTotal);
+  const { results: previewDeducts, totalDeductions } = computeDeductionsPreview(deductions, previewBasic, grossTotal, pfApplicable);
 
   const updateComp = (idx, updated) => setComponents(prev => prev.map((c, i) => i === idx ? updated : c));
   const deleteComp = (idx) => setComponents(prev => prev.filter((_, i) => i !== idx));
