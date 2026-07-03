@@ -203,6 +203,7 @@ const fmt = (n) => '₹' + Number(n || 0).toLocaleString('en-IN');
 
 // Compute live preview values from component list + sample CTC
 const computePreview = (components, ctc) => {
+  console.log('[SalaryMaster] computePreview called with:', { componentsCount: components.length, ctc, components });
   const monthly = Number(ctc) || 0;
   let basicSalary = 0;
   let sumNonRemaining = 0;
