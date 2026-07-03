@@ -208,9 +208,9 @@ const computePreview = (components, ctc) => {
   let sumNonRemaining = 0;
   const results = [];
 
-  // First pass: calculate ONLY basic_salary
+  // First pass: calculate ONLY basic salary (key = 'basic' or 'basic_salary')
   for (const c of components) {
-    if (c.key === 'basic_salary' && c.calculationType !== 'remaining') {
+    if ((c.key === 'basic' || c.key === 'basic_salary') && c.calculationType !== 'remaining') {
       let val = 0;
       if (c.calculationType === 'fixed') {
         val = Number(c.value) || 0;
@@ -226,7 +226,7 @@ const computePreview = (components, ctc) => {
 
   // Second pass: calculate all other non-remaining components using basicSalary
   for (const c of components) {
-    if (c.calculationType === 'remaining' || c.key === 'basic_salary') continue;
+    if (c.calculationType === 'remaining' || c.key === 'basic' || c.key === 'basic_salary') continue;
     let val = 0;
     if (c.calculationType === 'fixed') {
       val = Number(c.value) || 0;
