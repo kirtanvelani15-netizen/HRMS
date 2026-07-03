@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FiCheck, FiDownload, FiRefreshCw, FiPlay } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { payrollAPI } from '../../services/api';
-import { useAuth } from '../../hooks/useAuth';
 
 const Salary = () => {
-  const { user } = useAuth();
   const [payrolls, setPayrolls] = useState([]);
   const [filters, setFilters] = useState({ month: '', year: new Date().getFullYear(), status: '' });
   const [page, setPage] = useState(1);
