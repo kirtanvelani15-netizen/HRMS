@@ -151,6 +151,20 @@ export const payrollAPI = {
   saveCompliance: (data) => api.put('/payroll/compliance', data),
   generate: (data) => api.post('/payroll/generate', data),
   generateMonth: (data) => api.post('/payroll/generate-month', data),
+  approve: (id) => api.put(`/payroll/${id}/approve`),
+  approveMonth: (data) => api.post('/payroll/approve-month', data),
+  downloadPayslip: (id, filename) =>
+    api.get(`/payroll/${id}/payslip`, { responseType: 'blob' }).then(res => {
+      const url = URL.createObjectURL(res.data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename || `Payslip_${Date.now()}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }),
+  bulkUpdateStatus: (payrollIds, status) => api.put('/payroll/bulk-status', { payrollIds, status }),
+  getSetupStatus: () => api.get('/payroll/setup-status'),
+  getYTD: (employeeId) => api.get('/payroll/ytd', { params: employeeId ? { employee: employeeId } : {} }),
   getLeaveBalance: (employeeId) => api.get(employeeId ? `/payroll/leave-balance/${employeeId}` : '/payroll/leave-balance/me'),
   getTemplates: (params) => api.get('/payroll/templates', { params }),
   createTemplate: (data) => api.post('/payroll/templates', data),

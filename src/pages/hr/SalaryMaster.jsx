@@ -406,6 +406,10 @@ const SalaryMaster = () => {
   const [saving, setSaving] = useState(false);
   const [showAddComp, setShowAddComp] = useState(false);
   const [showAddDeduct, setShowAddDeduct] = useState(false);
+  const [pfApplicable, setPfApplicable] = useState(true);
+  const [uanNumber, setUanNumber] = useState('');
+  const [tdsApplicable, setTdsApplicable] = useState(false);
+  const [setupStatus, setSetupStatus] = useState([]);
 
   // Check pin status on mount
   useEffect(() => {
@@ -413,6 +417,15 @@ const SalaryMaster = () => {
       .then(res => setPinStatus({ isSet: !!res.data?.isSet }))
       .catch(() => setPinStatus({ isSet: false }));
   }, []);
+
+  // Fetch setup status
+  useEffect(() => {
+    if (unlocked && payrollAPI.getSetupStatus) {
+      payrollAPI.getSetupStatus()
+        .then(res => setSetupStatus(res.data?.data || []))
+        .catch(() => {});
+    }
+  }, [unlocked]);
 
   const loadTemplate = useCallback(async () => {
     setLoading(true);
@@ -423,6 +436,9 @@ const SalaryMaster = () => {
         setTemplateId(t._id);
         setBasicSalaryLocked(!!t.basicSalaryLocked);
         setOvertimeType(t.overtimeType || 'salary');
+        setPfApplicable(t.pfApplicable !== undefined ? t.pfApplicable : true);
+        setUanNumber(t.uanNumber || '');
+        setTdsApplicable(!!t.tdsApplicable);
         setComponents((t.components || []).map(apiToInternal));
         setDeductions((t.deductions || []).map(apiToInternal));
       }
@@ -474,10 +490,16 @@ const SalaryMaster = () => {
   const addDeduct = (d) => { setDeductions(prev => [...prev, d]); setShowAddDeduct(false); };
 
   const handleSave = async () => {
+    if (pfApplicable && !uanNumber) {
+      return toast.error('UAN Number is required when PF is enabled');
+    }
     setSaving(true);
     const payload = {
       name: 'Default Salary Master',
       overtimeType,
+      pfApplicable,
+      uanNumber,
+      tdsApplicable,
       components: components.map((c, i) => ({ ...internalToApi(c), order: i })),
       deductions: deductions.map((d, i) => ({ ...internalToApi(d), order: i })),
     };
@@ -624,6 +646,89 @@ const SalaryMaster = () => {
             </div>
           </div>
 
+          {/* PF CONFIGURATION */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-5 h-5 text-blue-600 dark:text-blue-400 font-bold">₹</span>
+              <h2 className="text-base font-semibold text-gray-900 dark:text-white">Provident Fund (PF)</h2>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="pf-applicable"
+                  checked={pfApplicable}
+                  onChange={(e) => {
+                    setPfApplicable(e.target.checked);
+                    if (!e.target.checked) setUanNumber('');
+                  }}
+                  className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
+                />
+                <label htmlFor="pf-applicable" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  PF Applicable for Employees
+                </label>
+              </div>
+              {pfApplicable && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    UAN Number (required when PF enabled)
+                  </label>
+                  <input
+                    type="text"
+                    value={uanNumber}
+                    onChange={(e) => setUanNumber(e.target.value.toUpperCase())}
+                    placeholder="e.g., 100012345678"
+                    maxLength="12"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 outline-none"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Universal Account Number (12 digits)</p>
+                </div>
+              )}
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3">
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  <strong>Employee Deduction:</strong> 12% of basic salary (as per compliance settings)
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  <strong>Employer Contribution:</strong> 12% of basic salary
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* TDS CONFIGURATION */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-5 h-5 text-orange-600 dark:text-orange-400 font-bold">%</span>
+              <h2 className="text-base font-semibold text-gray-900 dark:text-white">Tax Deducted at Source (TDS)</h2>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="tds-applicable"
+                  checked={tdsApplicable}
+                  onChange={(e) => setTdsApplicable(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
+                />
+                <label htmlFor="tds-applicable" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  TDS Applicable for Employees
+                </label>
+              </div>
+              {tdsApplicable && (
+                <div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                    TDS will be calculated as per income tax compliance settings (new regime)
+                  </p>
+                  <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg px-4 py-3">
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      TDS calculation is handled automatically during payroll generation based on annual income slabs.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* OVERTIME */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <div className="flex items-center gap-2 mb-4">
@@ -661,6 +766,32 @@ const SalaryMaster = () => {
               <FiInfo className="w-5 h-5 text-primary-500" />
               <h2 className="text-base font-semibold text-gray-900 dark:text-white">Live Preview</h2>
             </div>
+
+            {setupStatus.length > 0 && setupStatus.some(s => !s.hasStructure) && (
+              <div className="mb-6 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800 p-4">
+                <div className="flex items-start gap-3">
+                  <div className="text-yellow-600 dark:text-yellow-400 font-bold text-lg">⚠️</div>
+                  <div className="flex-1">
+                    <h3 className="text-sm font-semibold text-yellow-900 dark:text-yellow-300 mb-2">Pending Salary Setup</h3>
+                    <div className="space-y-1.5">
+                      {setupStatus
+                        .filter(s => !s.hasStructure)
+                        .slice(0, 5)
+                        .map(emp => (
+                          <p key={emp.employeeId} className="text-xs text-yellow-800 dark:text-yellow-200">
+                            {emp.employeeName} — No salary structure configured
+                          </p>
+                        ))}
+                    </div>
+                    {setupStatus.filter(s => !s.hasStructure).length > 5 && (
+                      <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-2">
+                        +{setupStatus.filter(s => !s.hasStructure).length - 5} more employees pending setup
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="mb-5">
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Sample Monthly CTC (₹)</label>
