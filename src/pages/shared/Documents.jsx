@@ -691,66 +691,192 @@ const UploadModal = ({ isOpen, onClose, form, setForm, file, setFile, fileRef, s
     return `${(bytes / 1048576).toFixed(1)} MB`;
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Upload Document" size="sm"
-      footer={
-        <>
-          <button onClick={onClose} className="btn-secondary">Cancel</button>
-          <button onClick={onUpload} disabled={saving} className="btn-primary">{saving ? 'Uploading...' : 'Upload'}</button>
-        </>
-      }
-    >
-      <div className="space-y-4">
-        {!isEmployee && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
+      <div
+        className="w-full max-w-lg bg-white dark:bg-gray-900 rounded-xl shadow-xl"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-start justify-between">
+          <div className="flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0">
+              <FiUpload className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Upload Document</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Upload employee document details</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors flex-shrink-0 ml-4"
+            aria-label="Close"
+          >
+            <FiX className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Form Content */}
+        <div className="px-6 py-6 space-y-5 overflow-y-auto max-h-[calc(100vh-200px)]">
+          {/* Employee Field */}
+          {!isEmployee && (
+            <div>
+              <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                Employee <span className="text-red-500">*</span>
+              </label>
+              {lockedEmployee ? (
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300">
+                  <FiUser className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <span className="text-sm">{lockedEmployee.firstName} {lockedEmployee.lastName}</span>
+                </div>
+              ) : (
+                <div className="relative">
+                  <select
+                    value={form.employee}
+                    onChange={e => setForm({ ...form, employee: e.target.value })}
+                    className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none cursor-pointer transition-all"
+                  >
+                    <option value="">Select Employee</option>
+                    {employees.map(e => <option key={e._id} value={e._id}>{e.firstName} {e.lastName}</option>)}
+                  </select>
+                  <FiChevronRight className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Document Type Field */}
           <div>
-            <label className="label">Employee</label>
-            {lockedEmployee ? (
-              <div className="input-field bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 cursor-not-allowed">
-                {lockedEmployee.firstName} {lockedEmployee.lastName}
-              </div>
-            ) : (
-              <select value={form.employee} onChange={e => setForm({ ...form, employee: e.target.value })} className="input-field">
-                <option value="">Select Employee</option>
-                {employees.map(e => <option key={e._id} value={e._id}>{e.firstName} {e.lastName}</option>)}
+            <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+              Document Type <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <select
+                value={form.type}
+                onChange={e => setForm({ ...form, type: e.target.value })}
+                className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none cursor-pointer transition-all"
+              >
+                {DOC_TYPES.map(t => <option key={t} value={t} className="capitalize">{getDocTypeLabel(t)}</option>)}
               </select>
-            )}
+              <FiChevronRight className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            </div>
           </div>
-        )}
-        <div>
-          <label className="label">Document Name *</label>
-          <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="input-field" placeholder="e.g., Aadhar Card" />
-        </div>
-        <div>
-          <label className="label">Document Type</label>
-          <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} className="input-field">
-            {DOC_TYPES.map(t => <option key={t} value={t} className="capitalize">{t.replace(/-/g, ' ')}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="label">File *</label>
-          <div onClick={() => fileRef.current.click()} className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center cursor-pointer hover:border-primary-400 transition-colors">
-            {file ? (
-              <div>
-                <FiFile className="w-8 h-8 mx-auto text-primary-600 mb-1" />
-                <p className="text-sm font-medium text-gray-900 dark:text-white">{file.name}</p>
-                <p className="text-xs text-gray-500">{formatSize(file.size)}</p>
-              </div>
-            ) : (
-              <div>
-                <FiUpload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
-                <p className="text-sm text-gray-500">Click to select file</p>
-                <p className="text-xs text-gray-400">PDF, DOC, Images up to 10MB</p>
-              </div>
-            )}
+
+          {/* Document Name Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+              Document Name <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <FiFile className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              <input
+                value={form.name}
+                onChange={e => setForm({ ...form, name: e.target.value })}
+                placeholder="e.g., Aadhaar Card"
+                className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
+              />
+            </div>
           </div>
-          <input ref={fileRef} type="file" className="hidden" onChange={e => setFile(e.target.files[0])} accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx" />
+
+          {/* File Upload Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+              File <span className="text-red-500">*</span>
+            </label>
+            <div
+              onClick={() => fileRef.current?.click()}
+              onDragOver={e => e.preventDefault()}
+              onDragEnter={e => e.preventDefault()}
+              onDrop={e => {
+                e.preventDefault();
+                const droppedFile = e.dataTransfer.files[0];
+                if (droppedFile) setFile(droppedFile);
+              }}
+              className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center cursor-pointer hover:border-primary-400 dark:hover:border-primary-500 hover:bg-primary-50/30 dark:hover:bg-primary-900/10 transition-all duration-200 group"
+            >
+              {file ? (
+                <div>
+                  <div className="w-12 h-12 mx-auto rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mb-3 group-hover:bg-primary-200 dark:group-hover:bg-primary-800/40 transition-colors">
+                    <FiFile className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{file.name}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{formatSize(file.size)}</p>
+                  <button
+                    onClick={e => {
+                      e.stopPropagation();
+                      setFile(null);
+                    }}
+                    className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium mt-2 transition-colors"
+                  >
+                    Change file
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <div className="w-12 h-12 mx-auto rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-3 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/10 transition-colors">
+                    <FiUpload className="w-6 h-6 text-gray-400 group-hover:text-primary-500 transition-colors" />
+                  </div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">Drag and drop your file here</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">or</p>
+                  <button
+                    onClick={e => {
+                      e.stopPropagation();
+                      fileRef.current?.click();
+                    }}
+                    className="text-sm font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 mt-2 transition-colors inline-block px-3 py-1 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20"
+                  >
+                    Choose File
+                  </button>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">PDF, DOC, Images up to 10MB</p>
+                </div>
+              )}
+            </div>
+            <input
+              ref={fileRef}
+              type="file"
+              className="hidden"
+              onChange={e => setFile(e.target.files[0])}
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx"
+            />
+          </div>
+
+          {/* Notes Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+              Notes <span className="text-gray-500 text-xs font-normal">(optional)</span>
+            </label>
+            <textarea
+              value={form.notes}
+              onChange={e => setForm({ ...form, notes: e.target.value })}
+              placeholder="Add any notes (optional)"
+              rows={3}
+              className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-none"
+            />
+          </div>
         </div>
-        <div>
-          <label className="label">Notes</label>
-          <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} className="input-field" rows={2} />
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex gap-3 justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-0 dark:focus:ring-offset-0"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onUpload}
+            disabled={saving}
+            className="px-4 py-2.5 rounded-lg bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700 text-white text-sm font-medium flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+          >
+            <FiUpload className="w-4 h-4" />
+            {saving ? 'Uploading...' : 'Upload'}
+          </button>
         </div>
       </div>
-    </Modal>
+    </div>
   );
 };
 
