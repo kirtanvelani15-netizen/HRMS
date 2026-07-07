@@ -167,14 +167,13 @@ const Holidays = () => {
             onDelete={deleteTemplate}
           />
 
-          {showTemplateForm && (
-            <WeekoffTemplateForm
-              editing={editingTemplate}
-              onCancel={cancelTemplateForm}
-              onSave={saveTemplate}
-              saving={templateSaving}
-            />
-          )}
+          <WeekoffTemplateForm
+            isOpen={showTemplateForm}
+            editing={editingTemplate}
+            onCancel={cancelTemplateForm}
+            onSave={saveTemplate}
+            saving={templateSaving}
+          />
 
           <DepartmentAssignment
             departments={departments}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Modal from '../../../components/common/Modal';
 
 const DAYS = [
   { value: 1, label: 'Mon' }, { value: 2, label: 'Tue' }, { value: 3, label: 'Wed' },
@@ -8,7 +9,7 @@ const DAYS = [
 
 const emptyForm = { name: '', offDays: [] };
 
-const WeekoffTemplateForm = ({ editing, onCancel, onSave, saving }) => {
+const WeekoffTemplateForm = ({ isOpen, editing, onCancel, onSave, saving }) => {
   const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
@@ -23,46 +24,54 @@ const WeekoffTemplateForm = ({ editing, onCancel, onSave, saving }) => {
   };
 
   return (
-    <div className="card p-5">
-      <div className="flex items-center gap-2 mb-1">
-        <span className="w-6 h-6 rounded-full bg-primary-600 text-white text-xs font-bold flex items-center justify-center shrink-0">2</span>
-        <h2 className="text-base font-semibold text-gray-900 dark:text-white">
-          {editing ? 'Edit Weekly Off Template' : 'Create New Weekly Off Template'}
-        </h2>
-      </div>
-      <p className="text-sm text-gray-500 mb-4">Select the days that will be considered as weekly off.</p>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <Modal
+      isOpen={isOpen}
+      onClose={onCancel}
+      title={editing ? 'Edit Weekly Off Template' : 'Create Weekly Off Template'}
+      size="md"
+      footer={
+        <>
+          <button onClick={onCancel} className="btn-secondary">Cancel</button>
+          <button
+            onClick={() => onSave(form)}
+            disabled={saving || !form.name.trim()}
+            className="btn-primary"
+          >
+            {saving ? 'Saving...' : 'Save Template'}
+          </button>
+        </>
+      }
+    >
+      <div className="space-y-4">
         <div>
-          <label className="label">Template Name</label>
-          <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-            className="input-field" placeholder="Enter template name" />
+          <label className="label">Template Name *</label>
+          <input
+            value={form.name}
+            onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+            className="input-field"
+            placeholder="e.g. 5-Day Week, 6-Day Week"
+            autoFocus
+          />
         </div>
+
         <div>
-          <label className="label mb-2">Select Weekly Off Days</label>
+          <label className="label mb-3 block">Select Weekly Off Days *</label>
           <div className="flex flex-wrap gap-3">
             {DAYS.map(d => (
-              <label key={d.value} className="flex items-center gap-1.5 text-sm cursor-pointer select-none">
-                <input type="checkbox" checked={form.offDays.includes(d.value)} onChange={() => toggleDay(d.value)}
-                  className="w-4 h-4 rounded accent-primary-600" />
-                {d.label}
+              <label key={d.value} className="flex items-center gap-2 text-sm cursor-pointer select-none hover:bg-gray-50 dark:hover:bg-gray-700/30 px-2 py-1 rounded transition-colors">
+                <input
+                  type="checkbox"
+                  checked={form.offDays.includes(d.value)}
+                  onChange={() => toggleDay(d.value)}
+                  className="w-4 h-4 rounded accent-primary-600"
+                />
+                <span className="font-medium text-gray-700 dark:text-gray-300">{d.label}</span>
               </label>
             ))}
           </div>
         </div>
       </div>
-
-      <div className="flex justify-end gap-3 mt-4">
-        <button onClick={onCancel} className="btn-secondary">Cancel</button>
-        <button
-          onClick={() => onSave(form)}
-          disabled={saving || !form.name.trim()}
-          className="btn-primary"
-        >
-          {saving ? 'Saving...' : 'Save Template'}
-        </button>
-      </div>
-    </div>
+    </Modal>
   );
 };
 
