@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { io } from 'socket.io-client';
 import DataTable from '../../components/common/DataTable';
 import Modal from '../../components/common/Modal';
+import ImportDialog from '../../components/common/ImportDialog';
 import { FiPlus, FiEdit2, FiSearch, FiUpload, FiCalendar, FiChevronLeft, FiChevronRight, FiLayers, FiDownload } from 'react-icons/fi';
 import { formatDate, getStatusColor, getInitials, downloadBlob } from '../../utils/helpers';
 import toast from 'react-hot-toast';
@@ -713,60 +714,58 @@ const Attendance = () => {
         </div>
       </Modal>
 
-      {/* Import Modal */}
-      <Modal isOpen={showImportModal} onClose={() => setShowImportModal(false)} title="Import Punch Excel" size="md"
-        footer={
-          <>
-            <button onClick={() => setShowImportModal(false)} className="btn-secondary">Close</button>
-            <button onClick={handleImport} disabled={importing} className="btn-primary">{importing ? 'Importing...' : 'Import'}</button>
-          </>
-        }
+      {/* Import Punch Dialog */}
+      <ImportDialog
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        title="Import Punch Excel"
+        description="Upload your Excel file to import punch data"
+        onImport={handleImport}
+        onFileChange={e => setImportForm(f => ({ ...f, file: e.target.files?.[0] || null }))}
+        onDownloadTemplate={handleDownloadTemplate}
+        onDateModeChange={mode => setImportForm(f => ({ ...f, dateMode: mode }))}
+        onDateChange={date => setImportForm(f => ({ ...f, date }))}
+        importing={importing}
+        downloading={downloadingTemplate}
+        importForm={importForm}
+        dateConfig={{
+          modes: [['sheet', 'Excel Date'], ['selected', 'Selected Date']],
+          selectedMode: importForm.dateMode,
+          selectedDate: importForm.date
+        }}
       >
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <label className="label mb-0">Excel File</label>
-            <button onClick={handleDownloadTemplate} disabled={downloadingTemplate}
-              className="flex items-center gap-1 text-xs text-primary-600 hover:underline font-medium disabled:opacity-50">
-              <FiDownload className="w-3 h-3" />
-              {downloadingTemplate ? 'Downloading...' : 'Download Template'}
-            </button>
-          </div>
-          <input type="file" accept=".xls,.xlsx" onChange={e => setImportForm(f => ({ ...f, file: e.target.files?.[0] || null }))} className="input-field" />
+        {importResult && (
           <div>
-            <label className="label">Date Selection</label>
-            <div className="grid grid-cols-2 gap-2">
-              {[['sheet', 'Excel Date'], ['selected', 'Selected Date']].map(([mode, label]) => (
-                <button key={mode} type="button" onClick={() => setImportForm(f => ({ ...f, dateMode: mode }))}
-                  className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${importForm.dateMode === mode ? 'bg-primary-700 text-white border-primary-700' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600'}`}>
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-          {importForm.dateMode === 'selected' && (
-            <div>
-              <label className="label">Attendance Date</label>
-              <input type="date" value={importForm.date} onChange={e => setImportForm(f => ({ ...f, date: e.target.value }))} className="input-field" />
-            </div>
-          )}
-          {importResult && (
-            <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-3 text-sm">
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div><p className="font-semibold text-gray-900 dark:text-white">{importResult.totalRows}</p><p className="text-xs text-gray-500">Rows</p></div>
-                <div><p className="font-semibold text-emerald-600">{importResult.imported}</p><p className="text-xs text-gray-500">Imported</p></div>
-                <div><p className="font-semibold text-amber-600">{importResult.unmatched}</p><p className="text-xs text-gray-500">Unmatched</p></div>
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Import Results</h4>
+            <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+              <div className="grid grid-cols-3 gap-3 text-center mb-3">
+                <div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{importResult.totalRows}</p>
+                  <p className="text-xs text-gray-500 mt-1">Total Rows</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-emerald-600">{importResult.imported}</p>
+                  <p className="text-xs text-gray-500 mt-1">Imported</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-amber-600">{importResult.unmatched}</p>
+                  <p className="text-xs text-gray-500 mt-1">Unmatched</p>
+                </div>
               </div>
               {importResult.results?.some(r => !r.success) && (
-                <div className="mt-3 max-h-36 overflow-auto space-y-1">
-                  {importResult.results.filter(r => !r.success).slice(0, 10).map((row, idx) => (
-                    <p key={`${row.name}-${idx}`} className="text-xs text-red-600">{row.name}: {row.error}</p>
-                  ))}
+                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                  <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Errors:</p>
+                  <div className="max-h-32 overflow-auto space-y-1">
+                    {importResult.results.filter(r => !r.success).slice(0, 10).map((row, idx) => (
+                      <p key={`${row.name}-${idx}`} className="text-xs text-red-600 dark:text-red-400">{row.name}: {row.error}</p>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
-          )}
-        </div>
-      </Modal>
+          </div>
+        )}
+      </ImportDialog>
     </div>
   );
 };
