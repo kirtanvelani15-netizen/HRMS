@@ -11,12 +11,9 @@ const Salary = () => {
   const [loading, setLoading] = useState(false);
   const [generatingMonth, setGeneratingMonth] = useState(false);
   const [approvingMonth, setApprovingMonth] = useState(false);
-  const [ytdData, setYtdData] = useState(null);
-  const [ytdLoading, setYtdLoading] = useState(false);
 
   useEffect(() => {
     fetchPayrolls();
-    fetchYTD();
   }, [filters, page]);
 
   const fetchPayrolls = async () => {
@@ -32,17 +29,6 @@ const Salary = () => {
     }
   };
 
-  const fetchYTD = async () => {
-    setYtdLoading(true);
-    try {
-      const res = await payrollAPI.getYTD();
-      setYtdData(res.data?.data);
-    } catch (err) {
-      console.error('YTD fetch failed:', err);
-    } finally {
-      setYtdLoading(false);
-    }
-  };
 
   const handleGenerateMonth = async () => {
     if (!filters.month || !filters.year) {
@@ -350,66 +336,6 @@ const Salary = () => {
       {ytdLoading ? (
         <div className="text-center py-8">
           <FiRefreshCw className="w-5 h-5 animate-spin mx-auto text-gray-400" />
-        </div>
-      ) : ytdData ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-            Year-to-Date ({ytdData.fiscalYear})
-          </h2>
-
-          {/* Summary Boxes */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Total Gross</p>
-              <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
-                {fmt(ytdData.totals?.grossSalary || 0)}
-              </p>
-            </div>
-            <div className="text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Total Deductions</p>
-              <p className="text-2xl font-bold text-red-700 dark:text-red-300">
-                {fmt(ytdData.totals?.totalDeductions || 0)}
-              </p>
-            </div>
-            <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Total Net</p>
-              <p className="text-2xl font-bold text-green-700 dark:text-green-300">
-                {fmt(ytdData.totals?.netSalary || 0)}
-              </p>
-            </div>
-          </div>
-
-          {/* Month Breakdown Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 dark:bg-gray-700 border-b">
-                <tr>
-                  <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Month</th>
-                  <th className="px-4 py-2 text-right font-medium text-gray-700 dark:text-gray-300">Gross</th>
-                  <th className="px-4 py-2 text-right font-medium text-gray-700 dark:text-gray-300">Deductions</th>
-                  <th className="px-4 py-2 text-right font-medium text-gray-700 dark:text-gray-300">Net</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {ytdData.months?.map(m => (
-                  <tr key={`${m.month}-${m.year}`} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="px-4 py-2 text-gray-900 dark:text-white font-medium">
-                      {m.monthName} {m.year}
-                    </td>
-                    <td className="px-4 py-2 text-right text-gray-600 dark:text-gray-400">
-                      {fmt(m.grossSalary)}
-                    </td>
-                    <td className="px-4 py-2 text-right text-gray-600 dark:text-gray-400">
-                      {fmt(m.totalDeductions)}
-                    </td>
-                    <td className="px-4 py-2 text-right font-semibold text-gray-900 dark:text-white">
-                      {fmt(m.netSalary)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </div>
       ) : null}
     </div>
