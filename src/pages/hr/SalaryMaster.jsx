@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FiSave, FiRefreshCw, FiInfo, FiPlus, FiTrash2, FiLock, FiClock, FiDollarSign, FiEye, FiEyeOff, FiKey } from 'react-icons/fi';
 import toast from 'react-hot-toast';
-import { payrollAPI } from '../../services/api';
+import { payrollAPI, employeeAPI } from '../../services/api';
 
 const SESSION_KEY = 'salaryMasterUnlocked';
 
@@ -489,7 +489,6 @@ const SalaryMaster = () => {
   // Fetch employees for assign modal
   useEffect(() => {
     if (unlocked && showAssignModal) {
-      const employeeAPI = require('../../services/api').employeeAPI;
       employeeAPI.getAll({ limit: 1000 })
         .then(res => setEmployees(res.data?.data || []))
         .catch(() => toast.error('Failed to load employees'));
