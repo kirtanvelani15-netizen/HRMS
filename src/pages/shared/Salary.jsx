@@ -332,12 +332,6 @@ const Salary = () => {
         )}
       </div>
 
-      {/* YTD Summary */}
-      {ytdLoading ? (
-        <div className="text-center py-8">
-          <FiRefreshCw className="w-5 h-5 animate-spin mx-auto text-gray-400" />
-        </div>
-      ) : null}
     </div>
   );
 };
