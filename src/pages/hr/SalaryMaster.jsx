@@ -201,87 +201,13 @@ const CALC_TYPES = [
 
 const fmt = (n) => '₹' + Number(n || 0).toLocaleString('en-IN');
 
-// Compute live preview values from component list + sample CTC
-const computePreview = (components, ctc) => {
-  const monthly = Number(ctc) || 0;
-  let basicSalary = 0;
-  let sumNonRemaining = 0;
-  const results = [];
-
-  // First pass: calculate ONLY basic salary (key = 'basic' or 'basic_salary')
-  for (const c of components) {
-    if ((c.key === 'basic' || c.key === 'basic_salary') && c.calculationType !== 'remaining') {
-      let val = 0;
-      if (c.calculationType === 'fixed') {
-        val = Number(c.value) || 0;
-      } else if (c.calculationType === 'percentage_ctc') {
-        val = Math.round(monthly * (Number(c.value) || 0) / 100);
-      }
-      basicSalary = val;
-      sumNonRemaining += val;
-      results.push({ ...c, computed: val });
-      break;
-    }
-  }
-
-  // Second pass: calculate all other non-remaining components using basicSalary
-  for (const c of components) {
-    if (c.calculationType === 'remaining' || c.key === 'basic' || c.key === 'basic_salary') continue;
-    let val = 0;
-    if (c.calculationType === 'fixed') {
-      val = Number(c.value) || 0;
-    } else if (c.calculationType === 'percentage_ctc') {
-      val = Math.round(monthly * (Number(c.value) || 0) / 100);
-    } else if (c.calculationType === 'percentage_basic') {
-      val = Math.round(basicSalary * (Number(c.value) || 0) / 100);
-    } else if (c.calculationType === 'percentage_gross') {
-      val = Math.round(monthly * (Number(c.value) || 0) / 100);
-    }
-    sumNonRemaining += val;
-    results.push({ ...c, computed: val });
-  }
-
-  // Third pass: handle remaining
-  const remainingVal = Math.max(0, monthly - sumNonRemaining);
-  const final = components.map(c => {
-    if (c.calculationType !== 'remaining') {
-      return results.find(r => r.key === c.key) || { ...c, computed: 0 };
-    }
-    return { ...c, computed: remainingVal };
-  });
-
-  const grossTotal = final.reduce((s, c) => s + (c.computed || 0), 0);
-  return { final, grossTotal, basicSalary };
-};
-
-const computeDeductionsPreview = (deductions, basicSalary, grossTotal) => {
-  const monthly = grossTotal;
-  const results = deductions.map(d => {
-    let val = 0;
-
-    // Special handling for PF: conditional based on basic salary
-    if (d.key === 'pf' || d.name?.toLowerCase().includes('pf') || d.name?.toLowerCase().includes('provident')) {
-      if (basicSalary >= 15000) {
-        // Basic >= 15,000: Fixed amount of 1800
-        val = 1800;
-      } else {
-        // Basic < 15,000: Calculate 12% of Basic
-        val = Math.round(basicSalary * 0.12);
-      }
-    } else if (d.calculationType === 'fixed') {
-      val = Number(d.value) || 0;
-    } else if (d.calculationType === 'percentage_ctc') {
-      val = Math.round(monthly * (Number(d.value) || 0) / 100);
-    } else if (d.calculationType === 'percentage_basic') {
-      val = Math.round(basicSalary * (Number(d.value) || 0) / 100);
-    } else if (d.calculationType === 'percentage_gross') {
-      val = Math.round(grossTotal * (Number(d.value) || 0) / 100);
-    }
-
-    return { ...d, computed: val };
-  });
-  const totalDeductions = results.reduce((s, d) => s + (d.computed || 0), 0);
-  return { results, totalDeductions };
+// Debounce utility
+const debounce = (func, wait) => {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
 };
 
 // Convert API component shape to internal shape
@@ -438,6 +364,7 @@ const SalaryMaster = () => {
   const [showAddComp, setShowAddComp] = useState(false);
   const [showAddDeduct, setShowAddDeduct] = useState(false);
   const [setupStatus, setSetupStatus] = useState([]);
+  const [previewData, setPreviewData] = useState(null); // Backend-calculated preview
 
   // Assign Template state
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -446,6 +373,60 @@ const SalaryMaster = () => {
   const [assignOvertimeRate, setAssignOvertimeRate] = useState('0');
   const [assignLoading, setAssignLoading] = useState(false);
   const [employees, setEmployees] = useState([]);
+
+  // Fetch payroll calculation from backend
+  const fetchPayrollCalculation = useCallback(debounce(async (comps, deducts, ctc) => {
+    if (comps.length === 0 || ctc <= 0) {
+      setPreviewData(null);
+      return;
+    }
+    try {
+      // Convert component format to API format
+      const earningsArr = comps.map(c => ({
+        key: c.key,
+        name: c.name,
+        calculationType: c.calculationType.startsWith('percentage_')
+          ? 'percentage'
+          : c.calculationType,
+        value: Number(c.value) || 0,
+        percentageOf: c.calculationType === 'percentage_ctc' ? 'ctc'
+          : c.calculationType === 'percentage_gross' ? 'grossSalary'
+          : 'basicSalary',
+        order: c.order || 0
+      }));
+
+      const deductionsArr = deducts.map(d => ({
+        key: d.key,
+        name: d.name,
+        calculationType: d.calculationType.startsWith('percentage_')
+          ? 'percentage'
+          : d.calculationType,
+        value: Number(d.value) || 0,
+        percentageOf: d.calculationType === 'percentage_ctc' ? 'ctc'
+          : d.calculationType === 'percentage_gross' ? 'grossSalary'
+          : 'basicSalary',
+        order: d.order || 0,
+        isSystemManaged: d.isSystemManaged || false
+      }));
+
+      const res = await payrollAPI.calculatePayroll({
+        ctc: Number(ctc) || 0,
+        earningsArr,
+        deductionsArr,
+        pfApplicable: true, // TODO: Make configurable per employee/structure
+        esiApplicable: false,
+        ptApplicable: false,
+        tdsApplicable: false
+      });
+
+      if (res.data?.success) {
+        setPreviewData(res.data.data);
+      }
+    } catch (err) {
+      console.error('Preview calculation error:', err);
+      // Silently fail - show previous data or null
+    }
+  }, 500), []);
 
   // Check pin status on mount
   useEffect(() => {
@@ -485,6 +466,13 @@ const SalaryMaster = () => {
   useEffect(() => {
     if (unlocked) loadTemplate();
   }, [unlocked, loadTemplate]);
+
+  // Fetch payroll preview from backend when components/deductions/CTC change
+  useEffect(() => {
+    if (unlocked && components.length > 0) {
+      fetchPayrollCalculation(components, deductions, previewCTC);
+    }
+  }, [components, deductions, previewCTC, unlocked, fetchPayrollCalculation]);
 
   // Fetch employees for assign modal
   useEffect(() => {
@@ -551,9 +539,6 @@ const SalaryMaster = () => {
       />
     );
   }
-
-  const { final: previewComps, grossTotal, basicSalary: previewBasic } = computePreview(components, previewCTC);
-  const { results: previewDeducts, totalDeductions } = computeDeductionsPreview(deductions, previewBasic, grossTotal);
 
   const updateComp = (idx, updated) => setComponents(prev => prev.map((c, i) => i === idx ? updated : c));
   const deleteComp = (idx) => setComponents(prev => prev.filter((_, i) => i !== idx));
@@ -649,7 +634,7 @@ const SalaryMaster = () => {
 
             {components.map((comp, idx) => {
               const isLocked = basicSalaryLocked && comp.key === 'basic_salary';
-              const preview = previewComps.find(p => p.key === comp.key);
+              const preview = previewData?.breakdown?.earnings?.find(p => p.key === comp.key);
               return (
                 <ComponentRow
                   key={comp.key + idx}
@@ -657,7 +642,7 @@ const SalaryMaster = () => {
                   isLocked={isLocked}
                   onChange={(updated) => updateComp(idx, updated)}
                   onDelete={() => deleteComp(idx)}
-                  previewValue={preview?.computed || 0}
+                  previewValue={preview?.value || 0}
                 />
               );
             })}
@@ -673,7 +658,7 @@ const SalaryMaster = () => {
 
             <div className="mt-4 flex items-center justify-between bg-emerald-50 dark:bg-emerald-900/20 rounded-lg px-4 py-3">
               <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Total Gross Earnings</span>
-              <span className="text-base font-bold text-emerald-600 dark:text-emerald-400">{fmt(grossTotal)}</span>
+              <span className="text-base font-bold text-emerald-600 dark:text-emerald-400">{fmt(previewData?.grossSalary || 0)}</span>
             </div>
           </div>
 
@@ -690,7 +675,7 @@ const SalaryMaster = () => {
             )}
 
             {deductions.map((d, idx) => {
-              const preview = previewDeducts.find(p => p.key === d.key);
+              const preview = previewData?.breakdown?.deductions?.find(p => p.key === d.key);
               return (
                 <ComponentRow
                   key={d.key + idx}
@@ -698,7 +683,7 @@ const SalaryMaster = () => {
                   isLocked={false}
                   onChange={(updated) => updateDeduct(idx, updated)}
                   onDelete={() => deleteDeduct(idx)}
-                  previewValue={preview?.computed || 0}
+                  previewValue={preview?.calculated || 0}
                 />
               );
             })}
@@ -714,7 +699,7 @@ const SalaryMaster = () => {
 
             <div className="mt-4 flex items-center justify-between bg-red-50 dark:bg-red-900/10 rounded-lg px-4 py-3">
               <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Total Deductions</span>
-              <span className="text-base font-bold text-red-600 dark:text-red-400">{fmt(totalDeductions)}</span>
+              <span className="text-base font-bold text-red-600 dark:text-red-400">{fmt(previewData?.totalDeductions || 0)}</span>
             </div>
           </div>
 
@@ -792,53 +777,53 @@ const SalaryMaster = () => {
             </div>
 
             {/* Earnings preview */}
-            {previewComps.length > 0 && (
+            {previewData?.breakdown?.earnings && previewData.breakdown.earnings.length > 0 && (
               <>
                 <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400 mb-2">Gross Earnings</p>
                 <div className="space-y-1.5 mb-3">
-                  {previewComps.map(c => (
+                  {previewData.breakdown.earnings.map(c => (
                     <div key={c.key} className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
                       <span>{c.name}</span>
-                      <span className="font-medium">{fmt(c.computed)}</span>
+                      <span className="font-medium">{fmt(c.value)}</span>
                     </div>
                   ))}
                 </div>
                 <div className="flex justify-between text-sm font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 rounded px-2 py-1.5 mb-4">
-                  <span>Total Gross</span><span>{fmt(grossTotal)}</span>
+                  <span>Total Gross</span><span>{fmt(previewData.grossSalary)}</span>
                 </div>
               </>
             )}
 
             {/* Deductions preview */}
-            {previewDeducts.length > 0 && (
+            {previewData?.breakdown?.deductions && previewData.breakdown.deductions.length > 0 && (
               <>
                 <p className="text-xs font-semibold uppercase tracking-wide text-red-500 dark:text-red-400 mb-2">Deductions</p>
                 <div className="space-y-1.5 mb-3">
-                  {previewDeducts.map(d => (
+                  {previewData.breakdown.deductions.map(d => (
                     <div key={d.key} className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
                       <span>{d.name}</span>
-                      <span className="font-medium text-red-500">− {fmt(d.computed)}</span>
+                      <span className="font-medium text-red-500">− {fmt(d.calculated)}</span>
                     </div>
                   ))}
                 </div>
                 <div className="flex justify-between text-sm font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/10 rounded px-2 py-1.5 mb-4">
-                  <span>Total Deductions</span><span>{fmt(totalDeductions)}</span>
+                  <span>Total Deductions</span><span>{fmt(previewData.totalDeductions)}</span>
                 </div>
               </>
             )}
 
-            {(previewComps.length > 0 || previewDeducts.length > 0) && (
+            {previewData && (
               <div className="rounded-xl bg-primary-600 dark:bg-primary-700 px-4 py-4 text-white">
                 <p className="text-xs font-medium opacity-80 mb-1">Gross − Deductions = Net Salary</p>
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-semibold">Net Salary</span>
-                  <span className="text-xl font-bold">{fmt(grossTotal - totalDeductions)}</span>
+                  <span className="text-xl font-bold">{fmt(previewData.netSalary)}</span>
                 </div>
-                <p className="text-xs opacity-70 mt-1">{fmt(grossTotal)} − {fmt(totalDeductions)} = {fmt(grossTotal - totalDeductions)}</p>
+                <p className="text-xs opacity-70 mt-1">{fmt(previewData.grossSalary)} − {fmt(previewData.totalDeductions)} = {fmt(previewData.netSalary)}</p>
               </div>
             )}
 
-            {previewComps.length === 0 && previewDeducts.length === 0 && (
+            {!previewData && (
               <p className="text-sm text-gray-400 italic text-center py-8">Add components to see live preview</p>
             )}
 

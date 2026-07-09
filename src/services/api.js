@@ -175,6 +175,7 @@ export const payrollAPI = {
       const a = document.createElement('a'); a.href = url; a.download = filename || 'CTC_Structure.pdf'; a.click(); URL.revokeObjectURL(url);
     }),
   calculateCompliance: (params) => api.get('/payroll/compliance/calculate', { params }),
+  calculatePayroll: (data) => api.post('/payroll/calculate', data),
   getSalaryMasterPinStatus: () => api.get('/payroll/salary-master-pin/status'),
   verifySalaryMasterPin: (pin) => api.post('/payroll/salary-master-pin/verify', { pin }),
   setSalaryMasterPin: (pin) => api.put('/payroll/salary-master-pin', { pin }),
