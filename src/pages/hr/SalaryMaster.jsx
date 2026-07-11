@@ -366,13 +366,7 @@ const SalaryMaster = () => {
   const [setupStatus, setSetupStatus] = useState([]);
   const [previewData, setPreviewData] = useState(null); // Backend-calculated preview
 
-  // Assign Template state
-  const [showAssignModal, setShowAssignModal] = useState(false);
-  const [assignEmployee, setAssignEmployee] = useState('');
-  const [assignCTC, setAssignCTC] = useState('');
-  const [assignOvertimeRate, setAssignOvertimeRate] = useState('0');
-  const [assignLoading, setAssignLoading] = useState(false);
-  const [employees, setEmployees] = useState([]);
+  // Assign Template state removed - feature no longer available
 
   // Fetch payroll calculation from backend
   const fetchPayrollCalculation = useCallback(debounce(async (comps, deducts, ctc) => {
@@ -484,36 +478,7 @@ const SalaryMaster = () => {
   }, [unlocked, showAssignModal]);
 
   // Assign template to employee
-  const handleAssignTemplate = async () => {
-    if (!assignEmployee) return toast.error('Select an employee');
-    if (!assignCTC || Number(assignCTC) <= 0) return toast.error('Enter valid CTC');
-    if (!templateId) return toast.error('Save the Salary Master template first');
-
-    setAssignLoading(true);
-    try {
-      await payrollAPI.assignTemplateToEmployee({
-        employee: assignEmployee,
-        template: templateId,
-        ctc: Number(assignCTC),
-        overtimeRate: Number(assignOvertimeRate) || 0
-      });
-      toast.success('Salary structure assigned to employee');
-      setShowAssignModal(false);
-      setAssignEmployee('');
-      setAssignCTC('');
-      setAssignOvertimeRate('0');
-      // Refresh setup status
-      if (payrollAPI.getSetupStatus) {
-        payrollAPI.getSetupStatus()
-          .then(res => setSetupStatus(res.data?.data || []))
-          .catch(() => {});
-      }
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to assign template');
-    } finally {
-      setAssignLoading(false);
-    }
-  };
+  // handleAssignTemplate removed - feature no longer available
 
   // Clear session on unmount so navigating away + back re-prompts password
   useEffect(() => {
@@ -599,10 +564,6 @@ const SalaryMaster = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowAssignModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 border border-blue-300 dark:border-blue-600 text-sm font-medium rounded-lg text-blue-600 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
-            <FiPlus className="w-4 h-4" /> Assign Template
-          </button>
           <button onClick={() => setShowChangePin(true)}
             className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
             <FiKey className="w-4 h-4" /> Change Password
@@ -837,94 +798,7 @@ const SalaryMaster = () => {
         </div>
       </div>
 
-      {/* Assign Template Modal */}
-      {showAssignModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <FiDollarSign className="w-5 h-5 text-blue-600" />
-              Assign Template to Employee
-            </h3>
-
-            <div className="space-y-4">
-              {/* Employee Selector */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Select Employee *
-                </label>
-                <select
-                  value={assignEmployee}
-                  onChange={(e) => setAssignEmployee(e.target.value)}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                >
-                  <option value="">Choose an employee...</option>
-                  {employees.map(emp => (
-                    <option key={emp._id} value={emp._id}>
-                      {emp.firstName} {emp.lastName} ({emp.designation || 'N/A'})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* CTC Input */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Annual CTC (₹) *
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={assignCTC}
-                  onChange={(e) => setAssignCTC(e.target.value)}
-                  placeholder="e.g., 500000"
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                />
-              </div>
-
-              {/* Overtime Rate */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Overtime Rate (₹/hour)
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.5"
-                  value={assignOvertimeRate}
-                  onChange={(e) => setAssignOvertimeRate(e.target.value)}
-                  placeholder="Optional"
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                />
-              </div>
-
-              {/* Info */}
-              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                <p className="text-xs text-blue-800 dark:text-blue-300">
-                  <strong>ℹ️</strong> This will calculate and assign the salary breakdown based on the current Salary Master template to this employee.
-                </p>
-              </div>
-            </div>
-
-            {/* Buttons */}
-            <div className="flex gap-2 mt-6">
-              <button
-                onClick={() => setShowAssignModal(false)}
-                className="flex-1 py-2.5 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAssignTemplate}
-                disabled={assignLoading}
-                className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
-              >
-                {assignLoading ? <FiRefreshCw className="w-4 h-4 animate-spin" /> : <FiDollarSign className="w-4 h-4" />}
-                {assignLoading ? 'Assigning...' : 'Assign'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Assign Template Modal - REMOVED */}
     </div>
   );
 };
