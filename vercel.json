@@ -1,5 +1,8 @@
 {
   "buildCommand": "node --max-old-space-size=4096 node_modules/.bin/vite build",
+  "env": {
+    "FORCE_REBUILD": "true"
+  },
   "rewrites": [
     {
       "source": "/api/:path*",
