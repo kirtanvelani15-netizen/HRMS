@@ -468,17 +468,7 @@ const SalaryMaster = () => {
     }
   }, [components, deductions, previewCTC, unlocked, fetchPayrollCalculation]);
 
-  // Fetch employees for assign modal
-  useEffect(() => {
-    if (unlocked && showAssignModal) {
-      employeeAPI.getAll({ limit: 1000 })
-        .then(res => setEmployees(res.data?.data || []))
-        .catch(() => toast.error('Failed to load employees'));
-    }
-  }, [unlocked, showAssignModal]);
-
-  // Assign template to employee
-  // handleAssignTemplate removed - feature no longer available
+  // Assign template feature removed - no longer needed
 
   // Clear session on unmount so navigating away + back re-prompts password
   useEffect(() => {
