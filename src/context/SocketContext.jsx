@@ -7,7 +7,7 @@ const SocketContext = createContext(null);
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL ||
   (window.location.hostname === 'localhost'
     ? 'http://localhost:5000'
-    : 'https://hr-backend-psi-five.vercel.app');
+    : 'https://athletic-connection-production-7781.up.railway.app');
 
 export const SocketProvider = ({ children }) => {
   const { user } = useAuth();
