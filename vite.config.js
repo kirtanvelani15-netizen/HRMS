@@ -14,6 +14,7 @@ const httpsConfig = (() => {
 })();
 
 export default defineConfig({
+  base: '/HRMS/',
   plugins: [
     react(),
     {
